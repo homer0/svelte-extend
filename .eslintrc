@@ -1,0 +1,5 @@
+{
+  "root": true,
+  "plugins": ["homer0"],
+  "extends": ["plugin:homer0/node"]
+}
