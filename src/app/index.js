@@ -1,6 +1,9 @@
 const Jimple = require('jimple');
 
-const { errorHandler } = require('wootils/node/errorHandler');
+const {
+  errorHandler,
+  appLogger,
+} = require('wootils/node/providers');
 const services = require('../services');
 
 class SvelteExtend extends Jimple {
@@ -8,6 +11,8 @@ class SvelteExtend extends Jimple {
     super();
 
     this.register(errorHandler);
+    this.register(appLogger);
+    this.register(services.extender);
     this.register(services.sfcData);
     this.register(services.sfcParser);
   }

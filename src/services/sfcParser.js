@@ -58,7 +58,7 @@ class SFCParser {
             data :
             this._createDataObject(fromFilepath, data);
 
-          file.addBaseFileData(useData);
+          file.addBaseFileData(useData, useExtendTag.attributes);
           return file;
         });
       }
@@ -77,8 +77,8 @@ class SFCParser {
       data.addScript(content, tag.attributes);
     });
 
-    parsedResults.script.forEach((script) => {
-      const { tag, content } = script;
+    parsedResults.style.forEach((style) => {
+      const { tag, content } = style;
       data.addStyle(content, tag.attributes);
     });
 
