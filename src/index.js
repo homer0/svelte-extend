@@ -1,2 +1,3 @@
-// eslint-disable-next-line no-console
-console.log('GO');
+const App = require('./app');
+
+module.exports = new App();
