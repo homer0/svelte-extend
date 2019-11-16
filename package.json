@@ -14,6 +14,10 @@
     "templating"
   ],
   "dependencies": {
+    "babylon": "^6.18.0",
+    "@babel/traverse": "7.7.2",
+    "@babel/types": "7.7.2",
+    "@babel/generator": "7.7.2",
     "fs-extra": "^8.1.0",
     "jimple": "^1.5.0",
     "wootils": "^2.6.5"

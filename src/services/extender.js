@@ -2,7 +2,8 @@ const path = require('path');
 const { provider } = require('jimple');
 
 class Extender {
-  constructor(sfcData) {
+  constructor(jsMerger, sfcData) {
+    this._jsMerger = jsMerger;
     this._sfcData = sfcData;
     this._expressions = {
       htmlSrc: /\s+(?:src="(\.[^"]+)"|src=(')(\.[^']+)')/ig,
@@ -131,10 +132,15 @@ class Extender {
     let content;
     if (targetHasJS) {
       if (targetJS.attributes.extend) {
-        const newBaseJS = baseJS.content ?
-          this._updateJSPaths(baseJS.content, directory) :
-          '';
-        content = `${newBaseJS}\n${targetJS.content}`;
+        if (baseJS.content) {
+          content = this._jsMerger.mergeCode(
+            this._updateJSPaths(baseJS.content, directory),
+            targetJS.content
+          );
+        } else {
+          ({ content } = targetJS);
+        }
+
         attributes = Object.assign({}, baseJS.attributes, targetJS.attributes);
       } else {
         ({ attributes, content } = targetJS);
@@ -228,7 +234,10 @@ class Extender {
 }
 
 const extender = provider((app) => {
-  app.set('extender', () => new Extender(app.get('sfcData')));
+  app.set('extender', () => new Extender(
+    app.get('jsMerger'),
+    app.get('sfcData')
+  ));
 });
 
 module.exports = {

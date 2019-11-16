@@ -52,6 +52,24 @@ class SFCData {
     });
   }
 
+  render() {
+    const lines = [];
+    if (this.hasModuleScripts) {
+      lines.push(this._renderTag('script', this.moduleScript));
+    }
+
+    if (this.hasScripts) {
+      lines.push(this._renderTag('script', this.script));
+    }
+
+    if (this.hasStyles) {
+      lines.push(this._renderTag('style', this.style));
+    }
+
+    lines.push(this.markup);
+    return lines.join('\n');
+  }
+
   get filepath() {
     return this._filepath;
   }
@@ -141,6 +159,32 @@ class SFCData {
     }
 
     return result;
+  }
+
+  _renderTag(name, tag) {
+    const attrsNames = Object.keys(tag.attributes);
+    let attrs;
+    if (attrsNames) {
+      attrs = attrsNames
+      .reduce(
+        (acc, attrName) => {
+          const value = tag.attributes[attrName];
+          return [...acc, `${attrName}="${value}"`];
+        },
+        []
+      )
+      .join(' ');
+      attrs = ` ${attrs}`;
+    } else {
+      attrs = '';
+    }
+
+    return [
+      `<${name}${attrs}>`,
+      tag.content,
+      `</${name}>`,
+    ]
+    .join('\n');
   }
 }
 

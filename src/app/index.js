@@ -13,6 +13,7 @@ class SvelteExtend extends Jimple {
     this.register(errorHandler);
     this.register(appLogger);
     this.register(services.extender);
+    this.register(services.jsMerger);
     this.register(services.sfcData);
     this.register(services.sfcParser);
   }
