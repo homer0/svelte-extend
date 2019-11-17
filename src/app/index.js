@@ -30,8 +30,11 @@ class SvelteExtend extends Jimple {
       filepath,
       maxDepth
     )
-    .then((sfc) => this.get('extender').generate(sfc))
-    .then((result) => result.render());
+    .then((sfc) => (
+      sfc === null ?
+        contents :
+        this.get('extender').generate(sfc).render()
+    ));
   }
 }
 

@@ -9,9 +9,9 @@
   "keywords": [
     "svelte",
     "extend",
-    "inheritance",
     "sfc",
-    "templating"
+    "webpack",
+    "rollup"
   ],
   "dependencies": {
     "babylon": "^6.18.0",
@@ -20,6 +20,7 @@
     "@babel/generator": "7.7.2",
     "fs-extra": "^8.1.0",
     "jimple": "^1.5.0",
+    "loader-utils": "^1.2.3",
     "rollup-pluginutils": "^2.8.2",
     "wootils": "^2.6.5"
   },
