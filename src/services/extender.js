@@ -6,7 +6,7 @@ class Extender {
     this._jsMerger = jsMerger;
     this._sfcData = sfcData;
     this._expressions = {
-      htmlSrc: /\s+(?:src="(\.[^"]+)"|src=(')(\.[^']+)')/ig,
+      htmlSrc: /\s+(?:src="(\.[^"]+)"|src='(\.[^']+)')/ig,
       cssUrl: /url\s*\(\s*(?:['"])?(\.[^"']+)(?:['"])?\)/ig,
       jsPaths: /(?: |^)(?:(?:from|import)\s+(?:["'](\.[^"']+)["'])|require\s*\(\s*["'](\.[^"']+)["']\s*\))/igm,
     };
@@ -179,10 +179,10 @@ class Extender {
     const items = [];
     let match = expression.exec(code);
     while (match) {
-      const [statement, itemPath] = match;
+      const [statement, itemPath, alternativeItemPath] = match;
       items.push({
         statement,
-        itemPath,
+        itemPath: itemPath || alternativeItemPath,
       });
 
       match = expression.exec(code);

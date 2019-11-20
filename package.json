@@ -47,7 +47,7 @@
   },
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"soon\"",
+    "test": "./utils/scripts/test",
     "lint": "./utils/scripts/lint",
     "lint:all": "./utils/scripts/lint-all",
     "docs": "./utils/scripts/docs",

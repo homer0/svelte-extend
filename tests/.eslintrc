@@ -1,0 +1,8 @@
+{
+  "root": true,
+  "plugins": ["homer0"],
+  "extends": ["plugin:homer0/jest"],
+  "globals": {
+    "module": true
+  }
+}

@@ -6,20 +6,20 @@ class SFCParser {
   constructor(sfcData) {
     this._sfcData = sfcData;
     this._expressions = {
-      extendTag: /<\s*extend\s+(.*?)\s*>(?:\s*<\s*\/\s*extend\s*>)/i,
+      extendTag: /<\s*extend\s+(.*?)\s*\/?>(?:\s*<\s*\/\s*extend\s*>)?/i,
       attributes: /([\w-]+)(?:\s*=\s*['"](.*?)['"]|\s*|$)/g,
       boolean: /(?:true|false)/i,
       relevantTags: /<\s*(\/\s*)?(script|style)(.*?)>/gi,
     };
   }
 
+  parse(contents, filepath, maxDepth = 0) {
+    return this._parse(contents, filepath, maxDepth, 1);
+  }
+
   parseFromPath(filepath, maxDepth = 0) {
     return fs.readFile(filepath, 'utf-8')
     .then((contents) => this.parse(contents, filepath, maxDepth));
-  }
-
-  parse(contents, filepath, maxDepth = 0) {
-    return this._parse(contents, filepath, maxDepth, 1);
   }
 
   _parse(contents, filepath, maxDepth, currentDepth, extendTag = null) {
@@ -51,7 +51,7 @@ class SFCParser {
         .then((data) => {
           const file = this._createDataObject(
             filepath,
-            this._parseFileData(contents.replace(useExtendTag.statement, ''))
+            this._parseFileData(contents.replace(useExtendTag.statement, ''), filepath)
           );
 
           const useData = data instanceof this._sfcData ?
@@ -99,14 +99,14 @@ class SFCParser {
           extendTag
         );
       } else {
-        nextStep = this._parseFileData(contents);
+        nextStep = this._parseFileData(contents, filepath);
       }
 
       return nextStep;
     });
   }
 
-  _parseFileData(contents) {
+  _parseFileData(contents, filepath) {
     let currentLines = [];
     let currentOpenTag = null;
     const result = {
@@ -114,70 +114,43 @@ class SFCParser {
       style: [],
       markup: '',
     };
+    const ignoreNextCounters = {
+      script: 0,
+      style: 0,
+    };
     const markupLines = [];
     contents
     .split('\n')
-    .forEach((line) => {
-      const tags = this._getRelevantTags(line);
-      if (tags.length) {
-        if (tags.length > 1) {
-          const subLines = [];
-          let currentSubLine = line;
-          tags.forEach((tag) => {
-            const tagIndex = currentSubLine.indexOf(tag.statement);
-            if (tagIndex) {
-              subLines.push(currentSubLine.substr(0, tagIndex));
-            }
-
-            subLines.push(tag);
-            currentSubLine = currentSubLine.substr(tagIndex + tag.statement.length);
-          });
-
-          subLines.forEach((subLine) => {
-            if (typeof subLine === 'string') {
-              currentLines.push(subLine);
+    .forEach((line, index) => {
+      const tag = this._getRelevantTag(line, index + 1, filepath);
+      if (tag) {
+        const rest = line.replace(tag.statement, '').trim();
+        if (rest && (!currentOpenTag || (currentOpenTag.name !== tag.name || tag.closing))) {
+          markupLines.push(rest);
+        }
+        if (currentOpenTag) {
+          if (currentOpenTag.name === tag.name && tag.closing) {
+            if (ignoreNextCounters[tag.name]) {
+              ignoreNextCounters[tag.name]--;
+              currentLines.push(line);
             } else {
-              const tag = subLine;
-              if (currentOpenTag) {
-                if (currentOpenTag.name === tag.name && tag.closing) {
-                  result[currentOpenTag.name].push({
-                    tag: currentOpenTag,
-                    content: currentLines.join('\n'),
-                  });
-                  currentOpenTag = null;
-                  currentLines = [];
-                } else {
-                  currentLines.push(line);
-                }
-              } else if (!tag.closing) {
-                markupLines.push(...currentLines);
-                currentLines = [];
-                currentOpenTag = tag;
-              } else {
-                currentLines.push(line);
-              }
-            }
-          });
-        } else {
-          const [tag] = tags;
-          if (currentOpenTag) {
-            if (currentOpenTag.name === tag.name && tag.closing) {
               result[currentOpenTag.name].push({
                 tag: currentOpenTag,
                 content: currentLines.join('\n'),
               });
               currentOpenTag = null;
               currentLines = [];
-            } else {
-              currentLines.push(line);
             }
-          } else if (!tag.closing) {
-            markupLines.push(...currentLines);
-            currentLines = [];
-            currentOpenTag = tag;
           } else {
+            if (currentOpenTag.name === tag.name) {
+              ignoreNextCounters[tag.name]++;
+            }
             currentLines.push(line);
           }
+        } else {
+          markupLines.push(...currentLines);
+          currentLines = [];
+          currentOpenTag = tag;
         }
       } else {
         currentLines.push(line);
@@ -195,22 +168,32 @@ class SFCParser {
     return result;
   }
 
-  _getRelevantTags(line) {
-    const result = [];
-    let match = this._expressions.relevantTags.exec(line);
-    while (match) {
+  _getRelevantTag(line, lineNumber, filepath) {
+    let result;
+    const match = this._expressions.relevantTags.exec(line);
+    if (match) {
       const [statement, slash, tagName, rawAttributes] = match;
       const name = tagName.trim();
       const closing = typeof slash !== 'undefined';
       const attributes = this._getTagAttributes(rawAttributes);
-      result.push({
+      result = {
         statement,
         name,
         closing,
         attributes,
-      });
+      };
 
-      match = this._expressions.relevantTags.exec(line);
+      if (this._expressions.relevantTags.exec(line)) {
+        const errorMessage = [
+          'The parser cant handle multiple script/style tags on the same line (sorry!)',
+          `- file: ${filepath}`,
+          `- line: ${lineNumber}`,
+          `- code: ${line}`,
+        ].join('\n');
+        throw new Error(errorMessage);
+      }
+    } else {
+      result = null;
     }
 
     return result;

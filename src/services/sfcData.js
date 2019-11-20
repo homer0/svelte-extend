@@ -127,7 +127,9 @@ class SFCData {
   }
 
   get moduleScript() {
-    return this._mergeTags(this._moduleScripts);
+    const result = this._mergeTags(this._moduleScripts);
+    result.attributes.context = 'module';
+    return result;
   }
 
   _mergeTags(tags) {
@@ -164,7 +166,7 @@ class SFCData {
   _renderTag(name, tag) {
     const attrsNames = Object.keys(tag.attributes);
     let attrs;
-    if (attrsNames) {
+    if (attrsNames.length) {
       attrs = attrsNames
       .reduce(
         (acc, attrName) => {
