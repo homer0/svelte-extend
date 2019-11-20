@@ -1,0 +1,306 @@
+{
+  "type": "File",
+  "start": 0,
+  "end": 638,
+  "loc": {
+    "start": {
+      "line": 1,
+      "column": 0
+    },
+    "end": {
+      "line": 28,
+      "column": 0
+    }
+  },
+  "program": {
+    "type": "Program",
+    "start": 0,
+    "end": 638,
+    "loc": {
+      "start": {
+        "line": 1,
+        "column": 0
+      },
+      "end": {
+        "line": 28,
+        "column": 0
+      }
+    },
+    "sourceType": "module",
+    "body": [],
+    "directives": [],
+    "leadingComments": null,
+    "innerComments": [
+      {
+        "type": "CommentBlock",
+        "value": "*\n * @external {Jimple}\n * https://yarnpkg.com/en/package/jimple\n ",
+        "start": 0,
+        "end": 70,
+        "loc": {
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 4,
+            "column": 3
+          }
+        }
+      },
+      {
+        "type": "CommentBlock",
+        "value": "*\n * @external {Class}\n * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes\n ",
+        "start": 72,
+        "end": 177,
+        "loc": {
+          "start": {
+            "line": 6,
+            "column": 0
+          },
+          "end": {
+            "line": 9,
+            "column": 3
+          }
+        }
+      },
+      {
+        "type": "CommentBlock",
+        "value": "*\n * @typedef {Object} SFCTag\n * @property {String} contents   The content of the tag.\n * @property {Object} attributes A dictionary of the tag attributes and their values.\n ",
+        "start": 179,
+        "end": 357,
+        "loc": {
+          "start": {
+            "line": 11,
+            "column": 0
+          },
+          "end": {
+            "line": 15,
+            "column": 3
+          }
+        }
+      },
+      {
+        "type": "CommentBlock",
+        "value": "*\n * @typedef {function} ProviderRegisterMethod\n * @param {Jimple} app\n * A reference to the dependency injection container.\n ",
+        "start": 359,
+        "end": 489,
+        "loc": {
+          "start": {
+            "line": 17,
+            "column": 0
+          },
+          "end": {
+            "line": 21,
+            "column": 3
+          }
+        }
+      },
+      {
+        "type": "CommentBlock",
+        "value": "*\n * @typedef {Object} Provider\n * @property {ProviderRegisterMethod} register\n * The method that gets called when registering the provider.\n ",
+        "start": 491,
+        "end": 637,
+        "loc": {
+          "start": {
+            "line": 23,
+            "column": 0
+          },
+          "end": {
+            "line": 27,
+            "column": 3
+          }
+        }
+      }
+    ]
+  },
+  "comments": [
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @external {Jimple}\n * https://yarnpkg.com/en/package/jimple\n ",
+      "start": 0,
+      "end": 70,
+      "loc": {
+        "start": {
+          "line": 1,
+          "column": 0
+        },
+        "end": {
+          "line": 4,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @external {Class}\n * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes\n ",
+      "start": 72,
+      "end": 177,
+      "loc": {
+        "start": {
+          "line": 6,
+          "column": 0
+        },
+        "end": {
+          "line": 9,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @typedef {Object} SFCTag\n * @property {String} contents   The content of the tag.\n * @property {Object} attributes A dictionary of the tag attributes and their values.\n ",
+      "start": 179,
+      "end": 357,
+      "loc": {
+        "start": {
+          "line": 11,
+          "column": 0
+        },
+        "end": {
+          "line": 15,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @typedef {function} ProviderRegisterMethod\n * @param {Jimple} app\n * A reference to the dependency injection container.\n ",
+      "start": 359,
+      "end": 489,
+      "loc": {
+        "start": {
+          "line": 17,
+          "column": 0
+        },
+        "end": {
+          "line": 21,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @typedef {Object} Provider\n * @property {ProviderRegisterMethod} register\n * The method that gets called when registering the provider.\n ",
+      "start": 491,
+      "end": 637,
+      "loc": {
+        "start": {
+          "line": 23,
+          "column": 0
+        },
+        "end": {
+          "line": 27,
+          "column": 3
+        }
+      }
+    }
+  ],
+  "tokens": [
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @external {Jimple}\n * https://yarnpkg.com/en/package/jimple\n ",
+      "start": 0,
+      "end": 70,
+      "loc": {
+        "start": {
+          "line": 1,
+          "column": 0
+        },
+        "end": {
+          "line": 4,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @external {Class}\n * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes\n ",
+      "start": 72,
+      "end": 177,
+      "loc": {
+        "start": {
+          "line": 6,
+          "column": 0
+        },
+        "end": {
+          "line": 9,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @typedef {Object} SFCTag\n * @property {String} contents   The content of the tag.\n * @property {Object} attributes A dictionary of the tag attributes and their values.\n ",
+      "start": 179,
+      "end": 357,
+      "loc": {
+        "start": {
+          "line": 11,
+          "column": 0
+        },
+        "end": {
+          "line": 15,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @typedef {function} ProviderRegisterMethod\n * @param {Jimple} app\n * A reference to the dependency injection container.\n ",
+      "start": 359,
+      "end": 489,
+      "loc": {
+        "start": {
+          "line": 17,
+          "column": 0
+        },
+        "end": {
+          "line": 21,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": "CommentBlock",
+      "value": "*\n * @typedef {Object} Provider\n * @property {ProviderRegisterMethod} register\n * The method that gets called when registering the provider.\n ",
+      "start": 491,
+      "end": 637,
+      "loc": {
+        "start": {
+          "line": 23,
+          "column": 0
+        },
+        "end": {
+          "line": 27,
+          "column": 3
+        }
+      }
+    },
+    {
+      "type": {
+        "label": "eof",
+        "beforeExpr": false,
+        "startsExpr": false,
+        "rightAssociative": false,
+        "isLoop": false,
+        "isAssign": false,
+        "prefix": false,
+        "postfix": false,
+        "binop": null,
+        "updateContext": null
+      },
+      "start": 638,
+      "end": 638,
+      "loc": {
+        "start": {
+          "line": 28,
+          "column": 0
+        },
+        "end": {
+          "line": 28,
+          "column": 0
+        }
+      }
+    }
+  ]
+}

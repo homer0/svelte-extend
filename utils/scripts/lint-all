@@ -1,2 +1,0 @@
-#!/bin/bash -e
-eslint ./ --ext .js

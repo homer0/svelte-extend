@@ -1,9 +1,0 @@
-#!/bin/bash -e
-
-if hash yarn 2>/dev/null; then
-  yarn run lint
-  yarn test
-else
-  npm run lint
-  npm test
-fi

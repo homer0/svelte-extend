@@ -1,0 +1,42 @@
+{
+  "coverage": "100%",
+  "expectCount": 93,
+  "actualCount": 93,
+  "files": {
+    "src/app/index.js": {
+      "expectCount": 4,
+      "actualCount": 4,
+      "undocumentLines": []
+    },
+    "src/rollup.js": {
+      "expectCount": 9,
+      "actualCount": 9,
+      "undocumentLines": []
+    },
+    "src/services/extender.js": {
+      "expectCount": 22,
+      "actualCount": 22,
+      "undocumentLines": []
+    },
+    "src/services/jsMerger.js": {
+      "expectCount": 9,
+      "actualCount": 9,
+      "undocumentLines": []
+    },
+    "src/services/sfcData.js": {
+      "expectCount": 34,
+      "actualCount": 34,
+      "undocumentLines": []
+    },
+    "src/services/sfcParser.js": {
+      "expectCount": 14,
+      "actualCount": 14,
+      "undocumentLines": []
+    },
+    "src/webpack.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    }
+  }
+}

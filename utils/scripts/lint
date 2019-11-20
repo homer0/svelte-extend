@@ -1,9 +1,0 @@
-#!/bin/bash -e
-files=$(git status -s | grep -E '[AM?]+\s.+?\.(js|jsx)$' | cut -c3-)
-
-# Prevent ESLint from running if there are no files
-if [[ $files = "" ]] ; then
-  exit 0
-fi
-
-eslint ${files} --no-ignore;

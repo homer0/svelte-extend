@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl">
+  <title data-ice="title">Home | svelte-extend</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Create new Svelte components by extending existing ones"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="svelte-extend"><meta property="twitter:description" content="Create new Svelte components by extending existing ones"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/homer0/svelte-extend"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/rollup.js~SvelteExtendRollupPlugin.html">SvelteExtendRollupPlugin</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-svelteExtendWebpackLoader">svelteExtendWebpackLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RollupFilter">RollupFilter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-SvelteExtendRollupPluginOptions">SvelteExtendRollupPluginOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Provider">Provider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ProviderRegisterMethod">ProviderRegisterMethod</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-SFCTag">SFCTag</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">Class</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://yarnpkg.com/en/package/jimple">Jimple</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#app">app</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/app/index.js~SvelteExtend.html">SvelteExtend</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#services">services</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/services/extender.js~Extender.html">Extender</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/services/jsMerger.js~JSMerger.html">JSMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/services/sfcData.js~SFCData.html">SFCData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/services/sfcParser.js~SFCParser.html">SFCParser</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-extender">extender</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-jsMerger">jsMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-sfcData">sfcData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-sfcParser">sfcParser</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><div data-ice="index" class="github-markdown"><h1 id="svelte-extend">svelte-extend</h1><p><a href="https://travis-ci.org/homer0/svelte-extend"><img src="https://img.shields.io/travis/homer0/svelte-extend.svg?style=flat-square" alt="Travis"></a>
+<a href="https://coveralls.io/github/homer0/svelte-extend?branch=master"><img src="https://img.shields.io/coveralls/github/homer0/svelte-extend.svg?style=flat-square" alt="Coveralls github"></a>
+<a href="https://david-dm.org/homer0/svelte-extend"><img src="https://img.shields.io/david/homer0/svelte-extend.svg?style=flat-square" alt="David"></a>
+<a href="https://david-dm.org/homer0/svelte-extend"><img src="https://img.shields.io/david/dev/homer0/svelte-extend.svg?style=flat-square" alt="David"></a></p>
+<p>Create new Svelte components by extending existing ones</p>
+<h2 id="introduction">Introduction</h2><blockquote>
+<p><strong>Disclaimer:</strong> I&apos;m aware that this doesn&apos;t existed for a reason, and while I consider the opinion of the author of Svelte to be valid, I needed this for a very specific case. If you are interested on using this library, I would recommend you to <strong>think hard if you really need it</strong>.</p>
+<p>Extending single file components is not the same as OOP inheritance, there&apos;s a lot of things that end up hidden (because there&apos;s no <code>class</code>) and your IDE (unless someone integrates this on an IDE :P) won&apos;t be able to warn you about.</p>
+</blockquote>
+<p>This library introduces an <code>extend</code> HTML tag that you&apos;ll be able to use on your <code>.svelte</code> files in order to indicate that the component you are creating extends from another one:</p>
+<pre><code class="lang-html"><code class="source-code prettyprint">&lt;extend from=&quot;./base-component.svelte&quot; /&gt;
+&lt;strong&gt;My new component&lt;/strong&gt;</code>
+</code></pre>
+<h2 id="usage">Usage</h2><p>As shown on the introduction snippet, you can reference a base component using the <code>extend</code> tag and then add custom markup to it.</p>
+<p>By default, an extended component will only take the <code>script</code> and <code>style</code> tags from the base component and use its own markup (HTML)... but you can change all of that.</p>
+<h3 id="html">HTML</h3><p>If you want to also bring the HTML from the base component, you just need to add the <code>html</code> attribute to the tag:</p>
+<pre><code class="lang-html"><code class="source-code prettyprint">&lt;extend from=&quot;./base-component.svelte&quot; html /&gt;
+&lt;strong&gt;My new component&lt;/strong&gt;</code>
+</code></pre>
+<p>Now, the generated component will have first the base component HTML and then the one you added.</p>
+<p>If you would want to do it the other way around, first the extended HTML and then the one from the base component, you just need to set the value of the <code>html</code> attribute to <code>before</code></p>
+<pre><code class="lang-html"><code class="source-code prettyprint">&lt;extend from=&quot;./base-component.svelte&quot; html=&quot;before&quot; /&gt;
+&lt;strong&gt;My new component&lt;/strong&gt;</code>
+</code></pre>
+<h3 id="scripts">Scripts</h3><p>By default, if the extended component doesn&apos;t have a <code>script</code> tag, the generated component will have the ones from the base; but if you want to overwrite it, you just need to create it:</p>
+<pre><code class="lang-html"><code class="source-code prettyprint">&lt;extend from=&quot;./base-component.svelte&quot; html=&quot;before&quot; /&gt;
+&lt;script&gt;
+  // ...
+&lt;/script&gt;
+&lt;strong&gt;My new component&lt;/strong&gt;</code>
+</code></pre>
+<p>Done, if the base one had a <code>script</code> tag, it won&apos;t be included on the generated component.</p>
+<p>Now, what if you want to add variables or change the way function works from the base component? Well, you can add a <code>extend</code> attribute to the extended <code>script</code> tag:</p>
+<pre><code class="lang-html"><code class="source-code prettyprint">&lt;extend from=&quot;./base-component.svelte&quot; html=&quot;before&quot; /&gt;
+&lt;script extend&gt;
+  // ...
+&lt;/script&gt;
+&lt;strong&gt;My new component&lt;/strong&gt;</code>
+</code></pre>
+<p>The library will put the contents of the base <code>script</code> tag first, then the contents of the <code>extended</code> tag and parse &amp; format the code to remove duplicated declarations, and move all the <code>import</code>/<code>require</code> statements to the top.</p>
+<blockquote>
+<p><strong>NOTE:</strong> This applies for both, regular <code>script</code> tags and <code>script</code> tags with the <code>context=&quot;module&quot;</code> attribute.</p>
+</blockquote>
+<h3 id="styles">Styles</h3><p>These works in way that is like a mix of scripts and markup: By default, if the extended component doesn&apos;t have a <code>style</code> tag, the generated component will have the one from the base; but if you want to overwrite it, like for scripts, you just need to create it:</p>
+<pre><code class="lang-html"><code class="source-code prettyprint">&lt;extend from=&quot;./base-component.svelte&quot; html=&quot;before&quot; /&gt;
+&lt;style&gt;
+  /**
+   * ...
+   */
+&lt;/style&gt;
+&lt;strong&gt;My new component&lt;/strong&gt;</code>
+</code></pre>
+<p>By creating it, you are telling the library that even if the base component has a <code>style</code> tag, you want to use the one from the extended component.</p>
+<p>And yes, you can extend it by adding a <code>extend</code> attribute:</p>
+<pre><code class="lang-html"><code class="source-code prettyprint">&lt;extend from=&quot;./base-component.svelte&quot; html=&quot;before&quot; /&gt;
+&lt;style extend&gt;
+  /**
+   * ...
+   */
+&lt;/style&gt;
+&lt;strong&gt;My new component&lt;/strong&gt;</code>
+</code></pre>
+<p>But this attribute works like the one for HTML, you can set the position in which you want to add the base styling:</p>
+<pre><code class="lang-html"><code class="source-code prettyprint">&lt;extend from=&quot;./base-component.svelte&quot; html=&quot;before&quot; /&gt;
+&lt;style extend=&quot;before&quot;&gt;
+  /**
+   * ...
+   */
+&lt;/style&gt;
+&lt;strong&gt;My new component&lt;/strong&gt;</code>
+</code></pre>
+<p>Now the extended code will come before the one from the base component.</p>
+<h2 id="integrations">Integrations</h2><p>Everything is great, but you are probably wondering how do you add it to a project.</p>
+<h3 id="webpack">webpack</h3><p>The library includes a webpack loader that you can add to your configuration:</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">{
+  test: /\.svelte$/i,
+  use: [
+    // The official one, to actually compile the `.svelte` files.
+    {
+      loader: &apos;svelte-loader&apos;,
+      options: { ... },
+    },
+    // The one for `svelte-extend`
+    {
+      loader: &apos;svelte-extend/webpack&apos;,
+      options: {
+        allowedMaxDepth: 0, // No limit.
+      },
+    },
+  ],
+}</code>
+</code></pre>
+<h4 id="options">Options</h4><ul>
+<li><code>allowedMaxDepth</code>: By default, the library allows you to also extend from already extended components, but if you want to limit how much &quot;levels&quot; a component could extend from, you can use this parameter. The default value is <code>0</code>, meaning it has no limit.</li>
+</ul>
+<h3 id="rollup">Rollup</h3><p>The library also includes a Rollup plugin:</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">const svelteExtend = require(&apos;svelte-extend/rollup&apos;);
+...
+
+module.exports = {
+  ...
+  plugins: [
+    ...,
+    // The official one, to actually compile the `.svelte` files.
+    svelte({ ... }),
+    // The one for `svelte-extend`
+    svelteExtend({
+      include: [], // Files to include.
+      exclude: [], // Files to exclude.
+      allowedMaxDepth: 0, // No limit.
+    });
+  ],
+};</code>
+</code></pre>
+<h4 id="options">Options</h4><ul>
+<li><code>include</code> &amp; <code>exclude</code>: The basic options for almost all Rollup plugins, to define which files should and shouldn&apos;t be processed by a plugin.</li>
+<li><code>allowedMaxDepth</code>: By default, the library allows you to also extend from already extended components, but if you want to limit how much &quot;levels&quot; a component could extend from, you can use this parameter. The default value is <code>0</code>, meaning it has no limit.</li>
+</ul>
+<h2 id="development">Development</h2><h3 id="npm-yarn-tasks">NPM/Yarn tasks</h3><table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test</code></td>
+<td>Run the project unit tests.</td>
+</tr>
+<tr>
+<td><code>lint</code></td>
+<td>Lint the modified files.</td>
+</tr>
+<tr>
+<td><code>lint:all</code></td>
+<td>Lint the entire project code.</td>
+</tr>
+<tr>
+<td><code>docs</code></td>
+<td>Generate the project documentation.</td>
+</tr>
+<tr>
+<td><code>todo</code></td>
+<td>List all the pending to-do&apos;s.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="repository-hooks">Repository hooks</h3><p>I use <a href="https://yarnpkg.com/en/package/husky">husky</a> to automatically install the repository hooks so the code will be tested and linted before any commit, and the dependencies updated after every merge. The configuration is on the <code>husky</code> property of the <code>package.json</code> and the hooks&apos; files are on <code>./utils/hooks</code>.</p>
+<h3 id="testing">Testing</h3><p>I use <a href="https://facebook.github.io/jest/">Jest</a> with <a href="https://yarnpkg.com/en/package/jest-ex">Jest-Ex</a> to test the project. The configuration file is on <code>./.jestrc.json</code>, the tests are on <code>./tests</code> and the script that runs it is on <code>./utils/scripts/test</code>.</p>
+<h3 id="linting">Linting</h3><p>I use <a href="http://eslint.org">ESlint</a> with <a href="http://yarnpkg.com/en/package/eslint-plugin-homer0">my own custom configuration</a> to validate all the JS code. The configuration file for the project code is on <code>./.eslintrc</code> and the one for the tests is on <code>./tests/.eslintrc</code>. There&apos;s also an <code>./.eslintignore</code> to exclude some files on the process. The script that runs it is on <code>./utils/scripts/lint</code>.</p>
+<h3 id="documentation">Documentation</h3><p>I use <a href="http://esdoc.org">ESDoc</a> to generate HTML documentation for the project. The configuration file is on <code>./.esdoc.json</code> and the script that runs it is on <code>./utils/scripts/docs</code>.</p>
+<h3 id="to-dos">To-Dos</h3><p>I use <code>@todo</code> comments to write all the pending improvements and fixes, and <a href="https://yarnpkg.com/en/package/leasot">Leasot</a> to generate a report. The script that runs it is on <code>./utils/scripts/todo</code>.</p>
+</div>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

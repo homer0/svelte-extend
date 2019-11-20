@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/services/jsMerger.js | svelte-extend</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Create new Svelte components by extending existing ones"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="svelte-extend"><meta property="twitter:description" content="Create new Svelte components by extending existing ones"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/homer0/svelte-extend"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/rollup.js~SvelteExtendRollupPlugin.html">SvelteExtendRollupPlugin</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-svelteExtendWebpackLoader">svelteExtendWebpackLoader</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-RollupFilter">RollupFilter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-SvelteExtendRollupPluginOptions">SvelteExtendRollupPluginOptions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-Provider">Provider</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-ProviderRegisterMethod">ProviderRegisterMethod</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-typedef">T</span><span data-ice="name"><span><a href="typedef/index.html#static-typedef-SFCTag">SFCTag</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">Class</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-external">E</span><span data-ice="name"><span><a href="https://yarnpkg.com/en/package/jimple">Jimple</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#app">app</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/app/index.js~SvelteExtend.html">SvelteExtend</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#services">services</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/services/extender.js~Extender.html">Extender</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/services/jsMerger.js~JSMerger.html">JSMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/services/sfcData.js~SFCData.html">SFCData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/services/sfcParser.js~SFCParser.html">SFCParser</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-extender">extender</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-jsMerger">jsMerger</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-sfcData">sfcData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-sfcParser">sfcParser</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/services/jsMerger.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const babylon = require(&apos;babylon&apos;);
+const babelTraverse = require(&apos;@babel/traverse&apos;).default;
+const babelTypes = require(&apos;@babel/types&apos;);
+const babelGenerator = require(&apos;@babel/generator&apos;).default;
+const { provider } = require(&apos;jimple&apos;);
+
+/**
+ * @typdef {function} JSMergerNameFuntion
+ * @description Gets the name/ID of an AST node declaration.
+ * @param {Object} nodePath The AST node path object that contains the declaration.
+ * @return {String}
+ * @ignore
+ */
+
+/**
+ * @typdef {Object} JSMergerCodeData
+ * @property {Object}  ast              The AST of the JS block code.
+ * @property {Array}   imports          A list of all the import declarations on the block.
+ * @property {Array}   variables        A list of all the variables declarations on the block.
+ * @property {Array}   bindings         A list of all the bindings declarations on the block.
+ * @property {Array}   functions        A list of all the functions declarations on the block.
+ * @property {?Object} firstContentNode A reference to the first node on the block that is not an
+ *                                      import declaration. This is used as an &quot;anchor&quot; to move all
+ *                                      the import declarations from the extend block to before
+ *                                      this node.
+ * @ignore
+ */
+
+/**
+ * This class takes care of merging two blocks of JS code by parsing their ASTs and getting rid
+ * of duplicated variables, &quot;bindings&quot; and functions. By &quot;binding&quot;, it referes to the named
+ * exports Svelte uses as props/bindings/attributes for the components.
+ */
+class JSMerger {
+  /**
+   * @ignore
+   */
+  constructor() {
+    /**
+     * @ignore
+     */
+    this._getBindingName = this._getBindingName.bind(this);
+    /**
+     * @ignore
+     */
+    this._getVariableName = this._getVariableName.bind(this);
+    /**
+     * @ignore
+     */
+    this._getFunctionName = this._getFunctionName.bind(this);
+  }
+  /**
+   * Merges two blocks of JS code.
+   * @param {String} base     The code that is being overwritten/extended.
+   * @param {String} extended The code that overwrites/extends.
+   * @return {String}
+   */
+  mergeCode(base, extended) {
+    const baseData = this._getCodeData(base);
+    const extendedData = this._getCodeData(extended);
+
+    if (baseData.firstContentNode) {
+      extendedData
+      .imports
+      .reverse()
+      .reduce(
+        (prevNode, importNode) =&gt; {
+          const { node: toAdd } = importNode;
+          importNode.remove();
+          const [newNode] = prevNode.insertBefore(toAdd);
+          return newNode;
+        },
+        baseData.firstContentNode
+      );
+    }
+
+    this._extendPaths(
+      baseData.bindings,
+      extendedData.bindings,
+      this._getBindingName
+    );
+    this._extendPaths(
+      baseData.variables,
+      extendedData.variables,
+      this._getVariableName
+    );
+    this._extendPaths(
+      baseData.functions,
+      extendedData.functions,
+      this._getFunctionName
+    );
+
+    const { code: baseCode } = babelGenerator(baseData.ast, {}, base);
+    const { code: extendedCode } = babelGenerator(extendedData.ast, {}, extended);
+
+    return `${baseCode}\n${extendedCode}`;
+  }
+  /**
+   * Processes a list of declarations of the same type (variables, bindings or functions) and
+   * replaces the original definitions with the extended ones.
+   * @param {Array}               basePaths      The list of declarations from the &quot;original block&quot;.
+   * @param {Array}               extendedPaths  The list of declarations from the &quot;extended block&quot;.
+   * @param {JSMergerNameFuntion} nameFn         The function that returns the name/ID of the
+   *                                             declaration.
+   * @access protected
+   * @ignore
+   */
+  _extendPaths(basePaths, extendedPaths, nameFn) {
+    const pathsByName = basePaths.reduce(
+      (acc, nodePath) =&gt; Object.assign({}, acc, {
+        [nameFn(nodePath)]: {
+          base: nodePath,
+        },
+      }),
+      {}
+    );
+
+    extendedPaths.forEach((nodePath) =&gt; {
+      const name = nameFn(nodePath);
+      if (pathsByName[name]) {
+        pathsByName[name].extended = nodePath;
+      }
+    });
+
+    Object.keys(pathsByName).forEach((name) =&gt; {
+      const nodePath = pathsByName[name];
+      if (nodePath.extended) {
+        const { node: toMove } = nodePath.extended;
+        nodePath.extended.remove();
+        nodePath.base.insertAfter(toMove);
+        nodePath.base.remove();
+      }
+    });
+  }
+  /**
+   * Parses a block of JS code in order to get the relevant information the class needs in order
+   * to do a merge.
+   * @param {String} code The block of JS code to parse.
+   * @return {JSMergerCodeData}
+   * @access protected
+   * @ignore
+   */
+  _getCodeData(code) {
+    const ast = babylon.parse(code, {
+      sourceType: &apos;module&apos;,
+    });
+
+    const imports = [];
+    const variables = [];
+    const bindings = [];
+    const functions = [];
+    let firstContentNode = null;
+    babelTraverse(ast, {
+      enter: (nodePath) =&gt; {
+        const isRoot = nodePath.parent &amp;&amp; babelTypes.isProgram(nodePath.parent);
+        if (babelTypes.isImportDeclaration(nodePath)) {
+          imports.push(nodePath);
+        } else if (!firstContentNode &amp;&amp; isRoot) {
+          firstContentNode = nodePath;
+        }
+
+        if (babelTypes.isVariableDeclaration(nodePath) &amp;&amp; nodePath.parent) {
+          if (isRoot) {
+            variables.push(nodePath);
+          } else if (babelTypes.isExportNamedDeclaration(nodePath.parent)) {
+            bindings.push(nodePath.parentPath);
+          }
+        } else if (babelTypes.isFunctionDeclaration(nodePath) &amp;&amp; isRoot) {
+          functions.push(nodePath);
+        }
+      },
+    });
+
+    return {
+      ast,
+      imports,
+      variables,
+      bindings,
+      functions,
+      firstContentNode,
+    };
+  }
+  /**
+   * Gets the name of a binding declaration. By &quot;binding&quot;, it referes to the named exports Svelte
+   * uses as props/bindings/attributes for the components.
+   * @param {Object} nodePath The AST node path object that contains the declaration.
+   * @return {String}
+   * @access protected
+   * @ignore
+   */
+  _getBindingName(nodePath) {
+    return nodePath.node.declaration.declarations[0].id.name;
+  }
+  /**
+   * Gets the name of a variable declaration.
+   * @param {Object} nodePath The AST node path object that contains the declaration.
+   * @return {String}
+   * @access protected
+   * @ignore
+   */
+  _getVariableName(nodePath) {
+    return nodePath.node.declarations[0].id.name;
+  }
+  /**
+   * Gets the name of a function declaration.
+   * @param {Object} nodePath The AST node path object that contains the declaration.
+   * @return {String}
+   * @access protected
+   * @ignore
+   */
+  _getFunctionName(nodePath) {
+    return nodePath.node.id.name;
+  }
+}
+/**
+ * The service provider that once registered on {@link SvelteExtend} will save the an instance of
+ * {@link JSMerger} as the `jsMerger` service.
+ * @type {Provider}
+ */
+const jsMerger = provider((app) =&gt; {
+  app.set(&apos;jsMerger&apos;, () =&gt; new JSMerger());
+});
+
+module.exports = {
+  JSMerger,
+  jsMerger,
+};
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
