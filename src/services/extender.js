@@ -1,22 +1,82 @@
 const path = require('path');
 const { provider } = require('jimple');
-
+/**
+ * This is the class that merges single file components (SFCs).
+ */
 class Extender {
+  /**
+   * @param {JSMerger}       jsMerger To merge the JS scripts and remove duplicated declarations.
+   * @param {Class<SFCData>} sfcData  To create a "final" SFC with the merged information.
+   */
   constructor(jsMerger, sfcData) {
+    /**
+     * A local reference for the `jsMerger` service.
+     * @type {JSMerger}
+     * @access protected
+     * @ignore
+     */
     this._jsMerger = jsMerger;
+    /**
+     * The class used to create the objects with the SFC merged information.
+     * @type {Class<SFCData>}
+     * @access protected
+     * @ignore
+     */
     this._sfcData = sfcData;
+    /**
+     * A dictionary of regular expression the class uses.
+     * @type {Object}
+     * @property {RegExp} htmlSrc A expression the class will use to find `src` attributes on
+     *                            HTML code in order to update relative paths when merging
+     *                            two SFCs.
+     * @property {RegExp} cssUrl  A expression the class will use to find `url()` properties on
+     *                            CSS code in order to update relative paths when merging
+     *                            two SFCs.
+     * @property {RegExp} jsPaths A expression the class will use to find `import` statements on
+     *                            JS code in order to update relative paths when merging two SFCs.
+     * @access protected
+     * @ignore
+     */
     this._expressions = {
       htmlSrc: /\s+(?:src="(\.[^"]+)"|src='(\.[^']+)')/ig,
       cssUrl: /url\s*\(\s*(?:['"])?(\.[^"']+)(?:['"])?\)/ig,
       jsPaths: /(?: |^)(?:(?:from|import)\s+(?:["'](\.[^"']+)["'])|require\s*\(\s*["'](\.[^"']+)["']\s*\))/igm,
     };
+    /**
+     * A list of private attributes used by the application and that should be removed from
+     * tags.
+     * @type {Array<String>}
+     * @access protected
+     * @ignore
+     */
     this._privateAttributes = ['extend'];
   }
-
+  /**
+   * Takes an SFC data object, check if it extends from another and then does a recursive merge
+   * in order to generate a final SFC data object. It's recursive in case an SFC extends from an
+   * SFC that then extends from another...
+   * @param {SFCData} sfc          The SFC information.
+   * @param {Number}  [maxDepth=0] How many components can be extended. For example, if a file
+   *                               extends from one that extends from another and the parameter
+   *                               is set to `1`, the parsing will fail.
+   * @return {SFCData}
+   * @throws {Error} If the "extend chain" goes beyond the `maxDepth` limit.
+   */
   generate(sfc, maxDepth = 0) {
     return this._generate(sfc, maxDepth, 1);
   }
-
+  /**
+   * The method that actually generates the "final SFC".
+   * @param {SFCData} sfc          The SFC information.
+   * @param {Number}  maxDepth     How many components can be extended. For example, if a file
+   *                               extends from one that extends from another and the parameter
+   *                               is set to `1`, the parsing will fail.
+   * @param {Number}  currentDepth The level of depth in which a file is currently being extended.
+   * @return {SFCData}
+   * @throws {Error} If the "extend chain" goes beyond the `maxDepth` limit.
+   * @access protected
+   * @ignore
+   */
   _generate(sfc, maxDepth, currentDepth) {
     let result;
     if (sfc.hasBaseFileData) {
@@ -36,7 +96,14 @@ class Extender {
 
     return result;
   }
-
+  /**
+   * Generates a single SFC data object by merging a base SFC and one that extends it.
+   * @param {SFCData} base   The data of the base SFC.
+   * @param {SFCData} target The data of the SFC that extends the base.
+   * @return {SFCData}
+   * @access protected
+   * @ignore
+   */
   _extend(base, target) {
     const relative = path.relative(target.directory, base.directory);
     const absolute = path.join(target.directory, relative);
@@ -59,7 +126,18 @@ class Extender {
 
     return sfc;
   }
-
+  /**
+   * Generates the markup of the merge of two SFCs. If the extended SFC doesn't have the `html`
+   * attribute on its `<extend />` tag, the returned markup won't contain the one from the base
+   * SFC.
+   * @param {SFCData} base      The data of the base SFC.
+   * @param {SFCData} target    The data of the SFC that extends the base.
+   * @param {String}  directory The relative directory path between the SFC that extends and the
+   *                            base one; this is used to update the relative paths on the code.
+   * @return {String}
+   * @access protected
+   * @ignore
+   */
   _extendMarkup(base, target, directory) {
     let result;
     const htmlPosition = this._getMergePosition(target.extendTagAttributes.html);
@@ -76,7 +154,19 @@ class Extender {
 
     return this._cleanTextBlock(result);
   }
-
+  /**
+   * Generates an style {@link SFCTag} of the merge of two SFCs. If the extended SFC doesn't
+   * have any styling, it will use the one from the base; but if there's a style tag, it will use
+   * that instead; and if the extended style tag uses the `extend` attribute, then the content of
+   * both tags will be merged.
+   * @param {SFCData} base      The data of the base SFC.
+   * @param {SFCData} target    The data of the SFC that extends the base.
+   * @param {String}  directory The relative directory path between the SFC that extends and the
+   *                            base one; this is used to update the relative paths on the code.
+   * @return {SFCTag}
+   * @access protected
+   * @ignore
+   */
   _extendStyle(base, target, directory) {
     const baseStyle = base.style;
     const targetStyle = target.style;
@@ -106,7 +196,19 @@ class Extender {
       content: this._cleanTextBlock(content),
     };
   }
-
+  /**
+   * Generates an script {@link SFCTag} of the merge of two SFCs. If the extended SFC doesn't
+   * have any scripts, it will use the one from the base; but if there's a script tag, it will use
+   * that instead; and if the extended script tag uses the `extend` attribute, then the content of
+   * both tags will be merged.
+   * @param {SFCData} base      The data of the base SFC.
+   * @param {SFCData} target    The data of the SFC that extends the base.
+   * @param {String}  directory The relative directory path between the SFC that extends and the
+   *                            base one; this is used to update the relative paths on the code.
+   * @return {SFCTag}
+   * @access protected
+   * @ignore
+   */
   _extendScript(base, target, directory) {
     return this._extendJSBlock(
       base.script,
@@ -115,7 +217,19 @@ class Extender {
       directory
     );
   }
-
+  /**
+   * Generates a module script {@link SFCTag} (the ones with the `context="module"` attribute) of
+   * the merge of two SFCs. If the extended SFC doesn't have any scripts, it will use the one from
+   * the base; but if there's a script tag, it will use that instead; and if the extended script
+   * tag uses the `extend` attribute, then the content of both tags will be merged.
+   * @param {SFCData} base      The data of the base SFC.
+   * @param {SFCData} target    The data of the SFC that extends the base.
+   * @param {String}  directory The relative directory path between the SFC that extends and the
+   *                            base one; this is used to update the relative paths on the code.
+   * @return {SFCTag}
+   * @access protected
+   * @ignore
+   */
   _extendModuleScript(base, target, directory) {
     const mScript = this._extendJSBlock(
       base.moduleScript,
@@ -126,7 +240,22 @@ class Extender {
     mScript.attributes.context = 'module';
     return mScript;
   }
-
+  /**
+   * This is a utility method used to merge script {@link SFCTag}s. It's used by both
+   * {@link Extender#_extendScript} and {@link Extender#_extendModuleScript}.
+   * If the extended SFC doesn't have any scripts, it will use the one from the base; but if
+   * there's a script tag, it will use that instead; and if the extended script tag uses the
+   * `extend` attribute, then the content of both tags will be merged.
+   * @param {SFCTag}  baseJS       The tag that represents all the scripts from the base SFC.
+   * @param {SFCTag}  targetJS     The tag that represents all the scripts from the extended SFC.
+   * @param {Boolean} targetHasJS  Whether or not the extended SFC has any scripts.
+   * @param {String}  directory    The relative directory path between the SFC that extends and
+   *                               the base one; this is used to update the relative paths on
+   *                               the code.
+   * @return {SFCTag}
+   * @access protected
+   * @ignore
+   */
   _extendJSBlock(baseJS, targetJS, targetHasJS, directory) {
     let attributes;
     let content;
@@ -155,7 +284,16 @@ class Extender {
       content: this._cleanTextBlock(content),
     };
   }
-
+  /**
+   * Updates relative paths on a block of JS code to be relative for a give directory. This is
+   * used when a block of JS code is going to be added on a extended SFC.
+   * @param {String} js        The code to update.
+   * @param {String} directory The relative path to the directory in which the extended SFC is
+   *                           located.
+   * @return {String}
+   * @access protected
+   * @ignore
+   */
   _updateJSPaths(js, directory) {
     return this._updateCodePaths(
       js,
@@ -163,18 +301,46 @@ class Extender {
       directory
     );
   }
-
+  /**
+   * Updates relative paths on a block of HTML code to be relative for a give directory. This is
+   * used when a block of HTML code is going to be added on a extended SFC.
+   * @param {String} markup    The code to update.
+   * @param {String} directory The relative path to the directory in which the extended SFC is
+   *                           located.
+   * @return {String}
+   * @access protected
+   * @ignore
+   */
   _updateMarkupPaths(markup, directory) {
     return this._updateCSSPaths(
       this._updateCodePaths(markup, this._expressions.htmlSrc, directory),
       directory
     );
   }
-
+  /**
+   * Updates relative paths on a block of CSS code to be relative for a give directory. This is
+   * used when a block of CSS code is going to be added on a extended SFC.
+   * @param {String} css       The code to update.
+   * @param {String} directory The relative path to the directory in which the extended SFC is
+   *                           located.
+   * @return {String}
+   * @access protected
+   * @ignore
+   */
   _updateCSSPaths(css, directory) {
     return this._updateCodePaths(css, this._expressions.cssUrl, directory);
   }
-
+  /**
+   * Utility method that updates paths on a given code to make them relative to a new directory.
+   * This is used to update the contents of an SFC before they are added to one that extends it.
+   * @param {String} code       The code to update.
+   * @param {RegExp} expression The expression to extract the relative paths.
+   * @param {String} directory  The relative path to the directory in which the extended SFC is
+   *                            located.
+   * @return {String}
+   * @access protected
+   * @ignore
+   */
   _updateCodePaths(code, expression, directory) {
     const items = [];
     let match = expression.exec(code);
@@ -199,7 +365,18 @@ class Extender {
 
     return newCode;
   }
-
+  /**
+   * A utility method that parses the value of an `extend` HTML attribute the class uses to
+   * determine the position of the base code in relation with the extended one:
+   * - `undefined` or `'false'`: `null` - the code won't be merged.
+   * - no value, `'true'` or `'after'`: first the base code and then the extended one.
+   * - `'before'`: first the extended code and then the base one.
+   * @param {String} [value] The value of the `extend` HTML attribute.
+   * @return {?String} If the attribute is not defined or if it's value is `'false'`, it will
+   *                   return `null`, indicating that the code shouldn't be merged.
+   * @access protected
+   * @ignore
+   */
   _getMergePosition(value) {
     const defaultValue = 'after';
     let result;
@@ -214,7 +391,14 @@ class Extender {
 
     return result;
   }
-
+  /**
+   * Utility method to remove empty lines from the beginning and end of a block of code. This
+   * method exists because is common for a block to end up like this when merging its contents.
+   * @param {String} text The text to clean.
+   * @return {String}
+   * @access protected
+   * @ignore
+   */
   _cleanTextBlock(text) {
     const newText = text
     .replace(/^\n/, '')
@@ -222,7 +406,13 @@ class Extender {
 
     return newText.trim() ? newText : '';
   }
-
+  /**
+   * Removes the {@link Extender#_privateAttributes} from a dictionary of attributes.
+   * @param {Object} attributes The dictionary of attributes to clean.
+   * @return {Object} A new dictionary without the private attributes
+   * @access protected
+   * @ignore
+   */
   _cleanAttributes(attributes) {
     const result = Object.assign({}, attributes);
     this._privateAttributes.forEach((name) => {
@@ -232,7 +422,11 @@ class Extender {
     return result;
   }
 }
-
+/**
+ * The service provider that once registered on {@link SvelteExtend} will save the an instance of
+ * {@link JSMerger} as the `jsMerger` service.
+ * @type {Provider}
+ */
 const extender = provider((app) => {
   app.set('extender', () => new Extender(
     app.get('jsMerger'),

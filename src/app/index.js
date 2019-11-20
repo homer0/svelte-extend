@@ -3,8 +3,14 @@ const Jimple = require('jimple');
 
 const { appLogger } = require('wootils/node/logger');
 const services = require('../services');
-
+/**
+ * The application main interface and dependency injection container.
+ * @extends {Jimple}
+ */
 class SvelteExtend extends Jimple {
+  /**
+   * @ignore
+   */
   constructor() {
     super();
 
@@ -14,7 +20,16 @@ class SvelteExtend extends Jimple {
     this.register(services.sfcData);
     this.register(services.sfcParser);
   }
-
+  /**
+   * Extends an Svelte single file component that implements the `<extend />` tag.
+   * @param {String} contents     The contents of the file.
+   * @param {String} filepath     The path of the file.
+   * @param {Number} [maxDepth=0] How many components can be extended. For example, if a file
+   *                              extends from one that extends from another and the parameter
+   *                              is set to `1`, the parsing will fail.
+   * @return  {Promise<?String,Error>} If the file doesn't implement the `<extend />` tag, the
+   *                                   promise will resolve with `null`.
+   */
   extend(contents, filepath, maxDepth = 0) {
     return this.get('sfcParser').parse(
       contents,
@@ -27,7 +42,17 @@ class SvelteExtend extends Jimple {
         this.get('extender').generate(sfc).render()
     ));
   }
-
+  /**
+   * Extends an Svelte single file component that implements the `<extend />` tag by using just
+   * its path; once the file is loaded, the method will internally call
+   * {@link SvelteExtend#extend}.
+   * @param {String} filepath     The path of the file.
+   * @param {Number} [maxDepth=0] How many components can be extended. For example, if a file
+   *                              extends from one that extends from another and the parameter
+   *                              is set to `1`, the parsing will fail.
+   * @return  {Promise<?String,Error>} If the file doesn't implement the `<extend />` tag, the
+   *                                   promise will resolve with `null`.
+   */
   extendFromPath(filepath, maxDepth = 0) {
     return fs.readFile(filepath, 'utf-8')
     .then((contents) => this.extend(contents, filepath, maxDepth));
