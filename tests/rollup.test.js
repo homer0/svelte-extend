@@ -1,7 +1,7 @@
-jest.mock('rollup-pluginutils');
+jest.mock('@rollup/pluginutils');
 jest.unmock('/src/rollup');
 
-const rollupUtils = require('rollup-pluginutils');
+const rollupUtils = require('@rollup/pluginutils');
 require('jasmine-expect');
 const app = require('/src/index');
 

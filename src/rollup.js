@@ -1,4 +1,4 @@
-const rollupUtils = require('rollup-pluginutils');
+const rollupUtils = require('@rollup/pluginutils');
 const app = require('./index');
 
 /**
