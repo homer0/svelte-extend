@@ -1,11 +1,8 @@
+jest.mock('jimple', () => require('../../tests/mocks/jimple.mock'));
+jest.unmock('../../src/services/extender');
+
 const path = require('path');
-const JimpleMock = require('/tests/mocks/jimple.mock');
-
-jest.mock('jimple', () => JimpleMock);
-jest.unmock('/src/services/extender');
-
-require('jasmine-expect');
-const { Extender, extender } = require('/src/services/extender');
+const { Extender, extender } = require('../../src/services/extender');
 
 describe('Extender', () => {
   const getSFCs = () => {

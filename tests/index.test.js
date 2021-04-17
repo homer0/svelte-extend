@@ -1,8 +1,7 @@
-jest.unmock('/src/index');
+jest.unmock('../src/index');
 
-require('jasmine-expect');
-const App = require('/src/app');
-const app = require('/src/index');
+const App = require('../src/app');
+const app = require('../src');
 
 describe('index', () => {
   it('should export an instanciated App', () => {

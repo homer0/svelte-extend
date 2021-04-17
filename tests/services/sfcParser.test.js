@@ -1,12 +1,9 @@
-const JimpleMock = require('/tests/mocks/jimple.mock');
-
 jest.mock('fs-extra');
-jest.mock('jimple', () => JimpleMock);
-jest.unmock('/src/services/sfcParser');
+jest.mock('jimple', () => require('../mocks/jimple.mock'));
+jest.unmock('../../src/services/sfcParser');
 
-require('jasmine-expect');
 const fs = require('fs-extra');
-const { SFCParser, sfcParser } = require('/src/services/sfcParser');
+const { SFCParser, sfcParser } = require('../../src/services/sfcParser');
 
 describe('SFCParser', () => {
   beforeEach(() => {

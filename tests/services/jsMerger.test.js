@@ -1,18 +1,15 @@
-const JimpleMock = require('/tests/mocks/jimple.mock');
-
-jest.mock('jimple', () => JimpleMock);
+jest.mock('jimple', () => require('../mocks/jimple.mock'));
 jest.mock('babylon');
 jest.mock('@babel/traverse');
 jest.mock('@babel/types');
 jest.mock('@babel/generator');
-jest.unmock('/src/services/jsMerger');
+jest.unmock('../../src/services/jsMerger');
 
-require('jasmine-expect');
 const babylon = require('babylon');
 const babelTraverse = require('@babel/traverse').default;
 const babelTypes = require('@babel/types');
 const babelGenerator = require('@babel/generator').default;
-const { JSMerger, jsMerger } = require('/src/services/jsMerger');
+const { JSMerger, jsMerger } = require('../../src/services/jsMerger');
 
 describe('JSMerger', () => {
   beforeEach(() => {

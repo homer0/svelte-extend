@@ -1,11 +1,10 @@
 jest.mock('loader-utils');
-jest.unmock('/src/webpack');
+jest.unmock('../src/webpack');
 
 const loaderUtils = require('loader-utils');
-require('jasmine-expect');
-const app = require('/src/index');
+const app = require('../src/index');
 
-const svelteExtendWebpackLoader = require('/src/webpack');
+const svelteExtendWebpackLoader = require('../src/webpack');
 
 describe('integrations:webpack', () => {
   beforeEach(() => {
