@@ -58,6 +58,12 @@
     "docs": "./utils/scripts/docs",
     "todo": "./utils/scripts/todo"
   },
+  "lint-staged": {
+    "*.js": [
+      "eslint",
+      "prettier --write"
+    ]
+  },
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
