@@ -56,7 +56,8 @@
     "lint": "./utils/scripts/lint",
     "lint:all": "./utils/scripts/lint-all",
     "docs": "./utils/scripts/docs",
-    "todo": "./utils/scripts/todo"
+    "todo": "./utils/scripts/todo",
+    "prepare": "./utils/scripts/prepare"
   },
   "lint-staged": {
     "*.js": [
@@ -68,11 +69,5 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "./utils/hooks/pre-commit",
-      "post-merge": "./utils/hooks/post-merge"
-    }
   }
 }
