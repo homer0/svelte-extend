@@ -58,6 +58,11 @@
     "docs": "./utils/scripts/docs",
     "todo": "./utils/scripts/todo"
   },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
   "husky": {
     "hooks": {
       "pre-commit": "./utils/hooks/pre-commit",
