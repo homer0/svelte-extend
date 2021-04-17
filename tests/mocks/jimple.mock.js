@@ -10,9 +10,7 @@ const mocks = {
 
     const result = services[name];
 
-    return servicesAsFunctions[name] ?
-      result() :
-      result;
+    return servicesAsFunctions[name] ? result() : result;
   }),
   register: jest.fn(),
   factory: jest.fn((fn) => fn()),

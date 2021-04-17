@@ -37,11 +37,7 @@ describe('integrations:webpack', () => {
     expect(loaderUtils.getOptions).toHaveBeenCalledWith(context);
     expect(context.async).toHaveBeenCalledTimes(1);
     expect(app.extend).toHaveBeenCalledTimes(1);
-    expect(app.extend).toHaveBeenCalledWith(
-      source,
-      context.resourcePath,
-      0
-    );
+    expect(app.extend).toHaveBeenCalledWith(source, context.resourcePath, 0);
     expect(fakePromise.then).toHaveBeenCalledTimes(1);
     expect(fakePromise.then).toHaveBeenCalledWith(expect.any(Function));
     expect(fakePromise.catch).toHaveBeenCalledTimes(1);
@@ -81,7 +77,7 @@ describe('integrations:webpack', () => {
     expect(app.extend).toHaveBeenCalledWith(
       source,
       context.resourcePath,
-      allowedMaxDepth
+      allowedMaxDepth,
     );
     expect(fakePromise.then).toHaveBeenCalledTimes(1);
     expect(fakePromise.then).toHaveBeenCalledWith(expect.any(Function));
@@ -114,11 +110,7 @@ describe('integrations:webpack', () => {
     expect(loaderUtils.getOptions).toHaveBeenCalledWith(context);
     expect(context.async).toHaveBeenCalledTimes(1);
     expect(app.extend).toHaveBeenCalledTimes(1);
-    expect(app.extend).toHaveBeenCalledWith(
-      source,
-      context.resourcePath,
-      0
-    );
+    expect(app.extend).toHaveBeenCalledWith(source, context.resourcePath, 0);
     expect(fakePromise.then).toHaveBeenCalledTimes(1);
     expect(fakePromise.then).toHaveBeenCalledWith(expect.any(Function));
     expect(fakePromise.catch).toHaveBeenCalledTimes(1);

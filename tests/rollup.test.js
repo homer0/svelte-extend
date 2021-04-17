@@ -50,7 +50,7 @@ describe('integrations:Rollup', () => {
     expect(rollupUtils.createFilter).toHaveBeenCalledTimes(1);
     expect(rollupUtils.createFilter).toHaveBeenCalledWith(
       options.include,
-      options.exclude
+      options.exclude,
     );
   });
 
@@ -115,7 +115,7 @@ describe('integrations:Rollup', () => {
     expect(app.extend).toHaveBeenCalledWith(code, filepath, allowedMaxDepth);
   });
 
-  it('should ignore a file because it doesn\'t have a .svelte extension', () => {
+  it("should ignore a file because it doesn't have a .svelte extension", () => {
     // Given
     const filter = jest.fn();
     rollupUtils.createFilter.mockImplementationOnce(() => filter);
@@ -132,7 +132,7 @@ describe('integrations:Rollup', () => {
     expect(app.extend).toHaveBeenCalledTimes(0);
   });
 
-  it('should ignore a file because it doesn\'t match the filter', () => {
+  it("should ignore a file because it doesn't match the filter", () => {
     // Given
     const filter = jest.fn(() => false);
     rollupUtils.createFilter.mockImplementationOnce(() => filter);

@@ -23,35 +23,32 @@ describe('SFCParser', () => {
     expect(sut).toBeInstanceOf(SFCParser);
   });
 
-  it('shouldn\'t parse a file that doesn\'t have an extend tag', () => {
+  it("shouldn't parse a file that doesn't have an extend tag", () => {
     let sut = null;
     sut = new SFCParser();
-    return sut.parse('<marquee>daaaamn</marquee>', '/some/file/path')
-    .then((result) => {
+    return sut.parse('<marquee>daaaamn</marquee>', '/some/file/path').then((result) => {
       expect(result).toBeNull();
     });
   });
 
-  it('should fail to parse a file if the base file doesn\'t exist', () => {
+  it("should fail to parse a file if the base file doesn't exist", () => {
     const baseFile = 'base.svelte';
     const targetFile = 'target.svelte';
     const targetExtendTag = `<extend from="./${baseFile}" html />`;
     const targetMarkup = '<marquee>daaaamn</marquee>';
-    const targetContents = [
-      targetExtendTag,
-      targetMarkup,
-    ].join('\n');
+    const targetContents = [targetExtendTag, targetMarkup].join('\n');
     fs.pathExists.mockImplementationOnce(() => Promise.resolve(false));
     let sut = null;
     sut = new SFCParser();
-    return sut.parse(targetContents, targetFile)
-    .then(() => {
-      expect(true).toBeFalse();
-    })
-    .catch((error) => {
-      expect(error).toBeInstanceOf(Error);
-      expect(error.message).toMatch(/unable to load/i);
-    });
+    return sut
+      .parse(targetContents, targetFile)
+      .then(() => {
+        expect(true).toBeFalse();
+      })
+      .catch((error) => {
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toMatch(/unable to load/i);
+      });
   });
 
   it('should fail to parse a file that has multiple tags on the same line', () => {
@@ -73,14 +70,10 @@ describe('SFCParser', () => {
     ].join('\n');
     const targetFile = 'target.svelte';
     const targetExtendTag = `<extend from="./${baseFile}" html />`;
-    const targetMarkup = [
-      '<marquee>daaaamn</marquee>',
-      '<img src="image.png" />',
-    ].join('\n');
-    const targetContents = [
-      targetExtendTag,
-      targetMarkup,
-    ].join('\n');
+    const targetMarkup = ['<marquee>daaaamn</marquee>', '<img src="image.png" />'].join(
+      '\n',
+    );
+    const targetContents = [targetExtendTag, targetMarkup].join('\n');
     const newData = {
       addBaseFileData: jest.fn(),
       addMarkup: jest.fn(),
@@ -97,21 +90,22 @@ describe('SFCParser', () => {
     fs.readFile.mockImplementationOnce(() => Promise.resolve(baseContents));
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parse(targetContents, targetFile)
-    .then(() => {
-      expect(true).toBeFalse();
-    })
-    .catch((error) => {
-      expect(error).toBeInstanceOf(Error);
-      expect(error.message).toBe(
-        [
-          'The parser cant handle multiple script/style tags on the same line (sorry!)',
-          `- file: ${baseFile}`,
-          '- line: 1',
-          `- code: ${problemLine}`,
-        ].join('\n')
-      );
-    });
+    return sut
+      .parse(targetContents, targetFile)
+      .then(() => {
+        expect(true).toBeFalse();
+      })
+      .catch((error) => {
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toBe(
+          [
+            'The parser cant handle multiple script/style tags on the same line (sorry!)',
+            `- file: ${baseFile}`,
+            '- line: 1',
+            `- code: ${problemLine}`,
+          ].join('\n'),
+        );
+      });
   });
 
   it('should parse a file', () => {
@@ -133,14 +127,10 @@ describe('SFCParser', () => {
     ].join('\n');
     const targetFile = 'target.svelte';
     const targetExtendTag = `<extend from="./${baseFile}" html />`;
-    const targetMarkup = [
-      '<marquee>daaaamn</marquee>',
-      '<img src="image.png" />',
-    ].join('\n');
-    const targetContents = [
-      targetExtendTag,
-      targetMarkup,
-    ].join('\n');
+    const targetMarkup = ['<marquee>daaaamn</marquee>', '<img src="image.png" />'].join(
+      '\n',
+    );
+    const targetContents = [targetExtendTag, targetMarkup].join('\n');
     const newData = {
       addBaseFileData: jest.fn(),
       addMarkup: jest.fn(),
@@ -157,8 +147,7 @@ describe('SFCParser', () => {
     fs.readFile.mockImplementationOnce(() => Promise.resolve(baseContents));
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parse(targetContents, targetFile)
-    .then((result) => {
+    return sut.parse(targetContents, targetFile).then((result) => {
       expect(result).toBe(newData);
       expect(fs.pathExists).toHaveBeenCalledTimes(1);
       expect(fs.pathExists).toHaveBeenCalledWith(baseFile);
@@ -214,14 +203,10 @@ describe('SFCParser', () => {
     ].join('\n');
     const targetFile = 'target.svelte';
     const targetExtendTag = `<extend from="./${baseFile}" html />`;
-    const targetMarkup = [
-      '<marquee>daaaamn</marquee>',
-      '<img src="image.png" />',
-    ].join('\n');
-    const targetContents = [
-      targetExtendTag,
-      targetMarkup,
-    ].join('\n');
+    const targetMarkup = ['<marquee>daaaamn</marquee>', '<img src="image.png" />'].join(
+      '\n',
+    );
+    const targetContents = [targetExtendTag, targetMarkup].join('\n');
     const newData = {
       addBaseFileData: jest.fn(),
       addMarkup: jest.fn(),
@@ -238,8 +223,7 @@ describe('SFCParser', () => {
     fs.readFile.mockImplementationOnce(() => Promise.resolve(baseContents));
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parse(targetContents, targetFile)
-    .then((result) => {
+    return sut.parse(targetContents, targetFile).then((result) => {
       expect(result).toBe(newData);
       expect(fs.pathExists).toHaveBeenCalledTimes(1);
       expect(fs.pathExists).toHaveBeenCalledWith(baseFile);
@@ -275,7 +259,7 @@ describe('SFCParser', () => {
       '<script>',
       'console.log(`',
       '<script>',
-      'console.log(\'inception\')',
+      "console.log('inception')",
       '</script>',
       '<style>',
       'a { color: blue; };',
@@ -298,14 +282,10 @@ describe('SFCParser', () => {
     ].join('\n');
     const targetFile = 'target.svelte';
     const targetExtendTag = `<extend from="./${baseFile}" html />`;
-    const targetMarkup = [
-      '<marquee>daaaamn</marquee>',
-      '<img src="image.png" />',
-    ].join('\n');
-    const targetContents = [
-      targetExtendTag,
-      targetMarkup,
-    ].join('\n');
+    const targetMarkup = ['<marquee>daaaamn</marquee>', '<img src="image.png" />'].join(
+      '\n',
+    );
+    const targetContents = [targetExtendTag, targetMarkup].join('\n');
     const newData = {
       addBaseFileData: jest.fn(),
       addMarkup: jest.fn(),
@@ -322,8 +302,7 @@ describe('SFCParser', () => {
     fs.readFile.mockImplementationOnce(() => Promise.resolve(baseContents));
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parse(targetContents, targetFile)
-    .then((result) => {
+    return sut.parse(targetContents, targetFile).then((result) => {
       expect(result).toBe(newData);
       expect(fs.pathExists).toHaveBeenCalledTimes(1);
       expect(fs.pathExists).toHaveBeenCalledWith(baseFile);
@@ -355,7 +334,7 @@ describe('SFCParser', () => {
   it('should parse a file that extends an already extended file', () => {
     const baseFile = 'base.svelte';
     const baseModuleScript = 'alert(window)';
-    const baseScript = 'console.log(\'Batman\');';
+    const baseScript = "console.log('Batman');";
     const baseStyle = 'a { color: red; }';
     const baseMarkup = '<markquee>woooo</marquee>';
     const baseContents = [
@@ -373,17 +352,11 @@ describe('SFCParser', () => {
     const subFile = 'sub.svelte';
     const subExtendTag = `<extend from="./${baseFile}" html />`;
     const subMarkup = '<marquee>daaaamn it</marquee>';
-    const subContents = [
-      subExtendTag,
-      subMarkup,
-    ].join('\n');
+    const subContents = [subExtendTag, subMarkup].join('\n');
     const targetFile = 'target.svelte';
     const targetExtendTag = `<extend from="./${subFile}" />`;
     const targetMarkup = '<marquee>daaaamn</marquee>';
-    const targetContents = [
-      targetExtendTag,
-      targetMarkup,
-    ].join('\n');
+    const targetContents = [targetExtendTag, targetMarkup].join('\n');
     const newData = {
       addBaseFileData: jest.fn(),
       addMarkup: jest.fn(),
@@ -409,8 +382,7 @@ describe('SFCParser', () => {
     fs.readFile.mockImplementationOnce(() => Promise.resolve(baseContents));
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parse(targetContents, targetFile)
-    .then((result) => {
+    return sut.parse(targetContents, targetFile).then((result) => {
       expect(result).toBeInstanceOf(SFCData);
       expect(fs.pathExists).toHaveBeenCalledTimes(2);
       expect(fs.pathExists).toHaveBeenCalledWith(baseFile);
@@ -451,17 +423,11 @@ describe('SFCParser', () => {
     const subFile = 'sub.svelte';
     const subExtendTag = `<extend from="./${baseFile}" html />`;
     const subMarkup = '<marquee>daaaamn it</marquee>';
-    const subContents = [
-      subExtendTag,
-      subMarkup,
-    ].join('\n');
+    const subContents = [subExtendTag, subMarkup].join('\n');
     const targetFile = 'target.svelte';
     const targetExtendTag = `<extend from="./${subFile}" />`;
     const targetMarkup = '<marquee>daaaamn</marquee>';
-    const targetContents = [
-      targetExtendTag,
-      targetMarkup,
-    ].join('\n');
+    const targetContents = [targetExtendTag, targetMarkup].join('\n');
     const newData = {
       addBaseFileData: jest.fn(),
       addMarkup: jest.fn(),
@@ -487,14 +453,15 @@ describe('SFCParser', () => {
     const maxDepth = 1;
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parse(targetContents, targetFile, maxDepth)
-    .then(() => {
-      expect(true).toBeFalse();
-    })
-    .catch((error) => {
-      expect(error).toBeInstanceOf(Error);
-      expect(error.message).toMatch(/can't extend from another file/i);
-    });
+    return sut
+      .parse(targetContents, targetFile, maxDepth)
+      .then(() => {
+        expect(true).toBeFalse();
+      })
+      .catch((error) => {
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toMatch(/can't extend from another file/i);
+      });
   });
 
   it('should fail to parse when trying to extend below the allowed depth (filepath)', () => {
@@ -502,17 +469,11 @@ describe('SFCParser', () => {
     const subFile = 'sub.svelte';
     const subExtendTag = `<extend from="./${baseFile}" html />`;
     const subMarkup = '<marquee>daaaamn it</marquee>';
-    const subContents = [
-      subExtendTag,
-      subMarkup,
-    ].join('\n');
+    const subContents = [subExtendTag, subMarkup].join('\n');
     const targetFile = 'target.svelte';
     const targetExtendTag = `<extend from="./${subFile}" />`;
     const targetMarkup = '<marquee>daaaamn</marquee>';
-    const targetContents = [
-      targetExtendTag,
-      targetMarkup,
-    ].join('\n');
+    const targetContents = [targetExtendTag, targetMarkup].join('\n');
     const newData = {
       addBaseFileData: jest.fn(),
       addMarkup: jest.fn(),
@@ -539,14 +500,15 @@ describe('SFCParser', () => {
     const maxDepth = 1;
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parseFromPath(targetFile, maxDepth)
-    .then(() => {
-      expect(true).toBeFalse();
-    })
-    .catch((error) => {
-      expect(error).toBeInstanceOf(Error);
-      expect(error.message).toMatch(/can't extend from another file/i);
-    });
+    return sut
+      .parseFromPath(targetFile, maxDepth)
+      .then(() => {
+        expect(true).toBeFalse();
+      })
+      .catch((error) => {
+        expect(error).toBeInstanceOf(Error);
+        expect(error.message).toMatch(/can't extend from another file/i);
+      });
   });
 
   it('should parse a file from its path', () => {
@@ -569,14 +531,10 @@ describe('SFCParser', () => {
     ].join('\n');
     const targetFile = 'target.svelte';
     const targetExtendTag = `<extend from="./${baseFile}" html />`;
-    const targetMarkup = [
-      '<marquee>daaaamn</marquee>',
-      '<img src="image.png" />',
-    ].join('\n');
-    const targetContents = [
-      targetExtendTag,
-      targetMarkup,
-    ].join('\n');
+    const targetMarkup = ['<marquee>daaaamn</marquee>', '<img src="image.png" />'].join(
+      '\n',
+    );
+    const targetContents = [targetExtendTag, targetMarkup].join('\n');
     const newData = {
       addBaseFileData: jest.fn(),
       addMarkup: jest.fn(),
@@ -594,8 +552,7 @@ describe('SFCParser', () => {
     fs.readFile.mockImplementationOnce(() => Promise.resolve(baseContents));
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parseFromPath(targetFile)
-    .then((result) => {
+    return sut.parseFromPath(targetFile).then((result) => {
       expect(result).toBe(newData);
       expect(fs.pathExists).toHaveBeenCalledTimes(1);
       expect(fs.pathExists).toHaveBeenCalledWith(baseFile);
@@ -633,9 +590,7 @@ describe('SFCParser', () => {
     };
     let sut = null;
     let serviceFn = null;
-    const expectedGets = [
-      'sfcData',
-    ];
+    const expectedGets = ['sfcData'];
     // When
     sfcParser(app);
     [[, serviceFn]] = app.set.mock.calls;

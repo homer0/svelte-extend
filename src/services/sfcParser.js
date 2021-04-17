@@ -4,32 +4,32 @@ const fs = require('fs-extra');
 
 /**
  * @typedef {Object} SFCParserResultTag
- * @property {String}  statement  The tag full statement (match) for the tag.
- * @property {String}  name       The name of the tag.
- * @property {Boolean} closing    Whether or not the tag is for closign (`</`).
- * @property {Object}  attributes A dictionary with the tag attributes.
+ * @property {string}  statement   The tag full statement (match) for the tag.
+ * @property {string}  name        The name of the tag.
+ * @property {boolean} closing     Whether or not the tag is for closign (`</`).
+ * @property {Object}  attributes  A dictionary with the tag attributes.
  * @ignore
  */
 
 /**
  * @typedef {Object} SFCParserResult
- * @property {String}             content The contents of a style/script tag.
- * @property {SFCParserResultTag} tag     The tag information.
+ * @property {string}             content  The contents of a style/script tag.
+ * @property {SFCParserResultTag} tag      The tag information.
  * @ignore
  */
 
 /**
  * @typedef {Object} SFCParserResults
- * @property {Array<SFCParserResult>} script A list of the script tags found on the SFC.
- * @property {Array<SFCParserResult>} style  A list of the style tags found on the SFC.
- * @property {String}                 markup The HTML markup of the SFC.
+ * @property {SFCParserResult[]} script  A list of the script tags found on the SFC.
+ * @property {SFCParserResult[]} style   A list of the style tags found on the SFC.
+ * @property {string}            markup  The HTML markup of the SFC.
  * @ignore
  */
 
 /**
+ * @property {string} statement   The tag full statement (match) for the tag.
+ * @property {Object} attributes  A dictionary with the tag attributes.
  * @typdef {Object} SFCParserExtendTag
- * @property {String}  statement  The tag full statement (match) for the tag.
- * @property {Object}  attributes A dictionary with the tag attributes.
  * @ignore
  */
 
@@ -39,12 +39,13 @@ const fs = require('fs-extra');
  */
 class SFCParser {
   /**
-   * @param {Class<SFCData>} sfcData The class used to create the objects with the SFC parsed
-   *                                 information.
+   * @param {Class<SFCData>} sfcData  The class used to create the objects with the SFC
+   *                                  parsed information.
    */
   constructor(sfcData) {
     /**
      * The class used to create the objects with the SFC parsed information.
+     *
      * @type {Class<SFCData>}
      * @access protected
      * @ignore
@@ -52,13 +53,15 @@ class SFCParser {
     this._sfcData = sfcData;
     /**
      * A dictionary of regular expression the parser uses.
+     *
      * @type {Object}
-     * @property {RegExp} extendTag    The expression that detects the `<extend />` tag.
-     * @property {RegExp} attributes   A expression that matches HTML attributes (outside a tag).
-     * @property {RegExp} boolean      A expression to detect whether or not a string is actually
-     *                                 a boolean flag.
-     * @property {RegExp} relevantTags A expression that matches relevant tags for the parser from
-     *                                 a line of code.
+     * @property {RegExp} extendTag     The expression that detects the `<extend />` tag.
+     * @property {RegExp} attributes    A expression that matches HTML attributes (outside
+     *                                  a tag).
+     * @property {RegExp} boolean       A expression to detect whether or not a string is
+     *                                  actually a boolean flag.
+     * @property {RegExp} relevantTags  A expression that matches relevant tags for the
+     *                                  parser from a line of code.
      * @access protected
      * @ignore
      */
@@ -71,49 +74,57 @@ class SFCParser {
   }
   /**
    * Parses a SFC.
-   * @param {String} contents     The contents of the file.
-   * @param {String} filepath     The path of the file.
-   * @param {Number} [maxDepth=0] How many components can be extended. For example, if a file
-   *                              extends from one that extends from another and the parameter
-   *                              is set to `1`, the parsing will fail.
-   * @return {Promise<?SFCData,Error>} If the file doesn't implement the `<extend />` tag, the
-   *                                   promise will resolve with `null`.
+   *
+   * @param {string} contents      The contents of the file.
+   * @param {string} filepath      The path of the file.
+   * @param {number} [maxDepth=0]  How many components can be extended. For example, if a
+   *                               file extends from one that extends from another and the
+   *                               parameter is set to `1`, the parsing will fail.
+   * @returns {Promise<?SFCData, Error>} If the file doesn't implement the `<extend />`
+   *                                     tag, the promise will resolve with `null`.
    */
   parse(contents, filepath, maxDepth = 0) {
     return this._parse(contents, filepath, maxDepth, 1);
   }
   /**
-   * Parses a SFC by loading the file first; after the file is loaded, the method will internally
-   * call {@link SFCParser#parse}.
-   * @param {String} filepath     The path of the file.
-   * @param {Number} [maxDepth=0] How many components can be extended. For example, if a file
-   *                              extends from one that extends from another and the parameter
-   *                              is set to `1`, the parsing will fail.
-   * @return {Promise<?SFCData,Error>} If the file doesn't implement the `<extend />` tag, the
-   *                                   promise will resolve with `null`.
+   * Parses a SFC by loading the file first; after the file is loaded, the method will
+   * internally call {@link SFCParser#parse}.
+   *
+   * @param {string} filepath      The path of the file.
+   * @param {number} [maxDepth=0]  How many components can be extended. For example, if a
+   *                               file extends from one that extends from another and the
+   *                               parameter is set to `1`, the parsing will fail.
+   * @returns {Promise<?SFCData, Error>} If the file doesn't implement the `<extend />`
+   *                                     tag, the promise will resolve with `null`.
    */
   parseFromPath(filepath, maxDepth = 0) {
-    return fs.readFile(filepath, 'utf-8')
-    .then((contents) => this.parse(contents, filepath, maxDepth));
+    return fs
+      .readFile(filepath, 'utf-8')
+      .then((contents) => this.parse(contents, filepath, maxDepth));
   }
   /**
-   * The method that actually does the parsing. The reason this is not in {@link SFCParser#parse}
-   * is because this method can be called recursively for each "level of extension a file has".
-   * @param {String}              contents         The contents of the file.
-   * @param {String}              filepath         The path of the file.
-   * @param {Number}              maxDepth         How many components can be extended. For
-   *                                               example, if a file extends from one that
-   *                                               extends from another and the parameter is set
-   *                                               to `1`, the parsing will fail.
-   * @param {Number}              currentDepth     The level of depth in which a file is currently
-   *                                               being extended.
-   * @param {?SFCParserExtendTag} [extendTag=null] When this method is called internally, it's
-   *                                               because another method found an `<extend />` tag
-   *                                               by reading a file and needs the file parsed, so
-   *                                               instead of looking for the tag again, the tag
-   *                                               can be provided with this parameter.
-   * @return {Promise<?SFCData,Error>} If the file doesn't implement the `<extend />` tag, the
-   *                                   promise will resolve with `null`.
+   * The method that actually does the parsing. The reason this is not in
+   * {@link SFCParser#parse}
+   * is because this method can be called recursively for each "level of extension a file
+   * has".
+   *
+   * @param {string}              contents          The contents of the file.
+   * @param {string}              filepath          The path of the file.
+   * @param {number}              maxDepth          How many components can be extended.
+   *                                                For example, if a file extends from
+   *                                                one that extends from another and the
+   *                                                parameter is set to `1`, the parsing
+   *                                                will fail.
+   * @param {number}              currentDepth      The level of depth in which a file is
+   *                                                currently being extended.
+   * @param {?SFCParserExtendTag} [extendTag=null]  When this method is called internally,
+   *                                                it's because another method found an
+   *                                                `<extend />` tag by reading a file and
+   *                                                needs the file parsed, so instead of
+   *                                                looking for the tag again, the tag can
+   *                                                be provided with this parameter.
+   * @returns {Promise<?SFCData, Error>} If the file doesn't implement the `<extend />`
+   *                                     tag, the promise will resolve with `null`.
    * @access protected
    * @ignore
    */
@@ -123,39 +134,45 @@ class SFCParser {
     if (useExtendTag && useExtendTag.attributes.from) {
       const newCurrentDepth = currentDepth + 1;
       if (maxDepth && newCurrentDepth > maxDepth) {
-        result = Promise.reject(new Error(
-          `The file '${filepath}' can't extend from another file, the max depth ` +
-          `limit is set to ${maxDepth}`
-        ));
+        result = Promise.reject(
+          new Error(
+            `The file '${filepath}' can't extend from another file, the max depth ` +
+              `limit is set to ${maxDepth}`,
+          ),
+        );
       } else {
         const filedir = path.dirname(filepath);
         const fromFilepath = path.join(filedir, useExtendTag.attributes.from);
-        result = fs.pathExists(fromFilepath)
-        .then((exists) => {
-          let nextStep;
-          if (exists) {
-            nextStep = this._loadDataFromPath(fromFilepath, maxDepth, newCurrentDepth);
-          } else {
-            nextStep = Promise.reject(new Error(
-              `Unable to load '${useExtendTag.attributes.from}' from '${filepath}'`
-            ));
-          }
+        result = fs
+          .pathExists(fromFilepath)
+          .then((exists) => {
+            let nextStep;
+            if (exists) {
+              nextStep = this._loadDataFromPath(fromFilepath, maxDepth, newCurrentDepth);
+            } else {
+              nextStep = Promise.reject(
+                new Error(
+                  `Unable to load '${useExtendTag.attributes.from}' from '${filepath}'`,
+                ),
+              );
+            }
 
-          return nextStep;
-        })
-        .then((data) => {
-          const file = this._createDataObject(
-            filepath,
-            this._parseFileData(contents.replace(useExtendTag.statement, ''), filepath)
-          );
+            return nextStep;
+          })
+          .then((data) => {
+            const file = this._createDataObject(
+              filepath,
+              this._parseFileData(contents.replace(useExtendTag.statement, ''), filepath),
+            );
 
-          const useData = data instanceof this._sfcData ?
-            data :
-            this._createDataObject(fromFilepath, data);
+            const useData =
+              data instanceof this._sfcData
+                ? data
+                : this._createDataObject(fromFilepath, data);
 
-          file.addBaseFileData(useData, useExtendTag.attributes);
-          return file;
-        });
+            file.addBaseFileData(useData, useExtendTag.attributes);
+            return file;
+          });
       }
     } else {
       result = Promise.resolve(null);
@@ -165,9 +182,11 @@ class SFCParser {
   }
   /**
    * Creates an instance of {@link SFCData} with the parsed results of an SFC.
-   * @param {String}           filepath      The path of the SFC.
-   * @param {SFCParserResults} parsedResults The information obtained from parsing the SFC.
-   * @return {SFCData}
+   *
+   * @param {string}           filepath       The path of the SFC.
+   * @param {SFCParserResults} parsedResults  The information obtained from parsing the
+   *                                          SFC.
+   * @returns {SFCData}
    * @access protected
    * @ignore
    */
@@ -188,30 +207,25 @@ class SFCParser {
   }
   /**
    * Loads a SFC and checks if it implements an `<extend />` tag; if it does, it calls
-   * {@link SFCParser#_parse} to parse its "base SFC" first; otherwise, it parses its contents
-   * directly.
-   * @param {String} filepath     The path of the file.
-   * @param {Number} maxDepth     How many components can be extended. For example, if a file
-   *                              extends from one that extends from another and the parameter
-   *                              is set to `1`, the parsing will fail.
-   * @param {Number} currentDepth The level of depth in which a file is currently being extended.
-   * @return {Promise<SFCData|SFCParserResults,Error>}
+   * {@link SFCParser#_parse} to parse its "base SFC" first; otherwise, it parses its
+   * contents directly.
+   *
+   * @param {string} filepath      The path of the file.
+   * @param {number} maxDepth      How many components can be extended. For example, if a
+   *                               file extends from one that extends from another and the
+   *                               parameter is set to `1`, the parsing will fail.
+   * @param {number} currentDepth  The level of depth in which a file is currently being
+   *                               extended.
+   * @returns {Promise<SFCData | SFCParserResults, Error>}
    * @access protected
    * @ignore
    */
   _loadDataFromPath(filepath, maxDepth, currentDepth) {
-    return fs.readFile(filepath, 'utf-8')
-    .then((contents) => {
+    return fs.readFile(filepath, 'utf-8').then((contents) => {
       let nextStep;
       const extendTag = this._getExtendTag(contents);
       if (extendTag) {
-        nextStep = this._parse(
-          contents,
-          filepath,
-          maxDepth,
-          currentDepth,
-          extendTag
-        );
+        nextStep = this._parse(contents, filepath, maxDepth, currentDepth, extendTag);
       } else {
         nextStep = this._parseFileData(contents, filepath);
       }
@@ -221,9 +235,10 @@ class SFCParser {
   }
   /**
    * Parses a SFC code and extract the information about its scripts, styling and markup.
-   * @param {String} contents The contents of the SFC.
-   * @param {String} filepath The path of the SFC.
-   * @return {SFCParserResults}
+   *
+   * @param {string} contents  The contents of the SFC.
+   * @param {string} filepath  The path of the SFC.
+   * @returns {SFCParserResults}
    * @access protected
    * @ignore
    */
@@ -263,62 +278,65 @@ class SFCParser {
     const markupLines = [];
     // Let the parsing beging!
     contents
-    // Separate the file by its lines.
-    .split('\n')
-    // And for each line...
-    .forEach((line, index) => {
-      // Try to find a relevant tag for the parser, script or style.
-      const tag = this._getRelevantTag(line, index + 1, filepath);
-      if (tag) {
-        // If a tag was found, remove the tag form the line...
-        const rest = line.replace(tag.statement, '').trim();
-        /**
-         * And if the line still has content, and no tag is currently open, or another tag
-         * with the same name is open, or the tag that was removed is for closing the opened
-         * tag... consider it markup.
-         * Like the counters, this is for edge cases.
-         */
-        if (rest && (!currentOpenTag || (currentOpenTag.name !== tag.name || tag.closing))) {
-          markupLines.push(rest);
-        }
-        if (currentOpenTag) {
-          // If a tag is currently open...
-          if (currentOpenTag.name === tag.name && tag.closing) {
-            // And the tag found is for closing it...
-            if (ignoreNextCounters[tag.name]) {
-              // If the counter is not `0`, decrement it and ignore the tag, just save the line.
-              ignoreNextCounters[tag.name]--;
-              currentLines.push(line);
+      // Separate the file by its lines.
+      .split('\n')
+      // And for each line...
+      .forEach((line, index) => {
+        // Try to find a relevant tag for the parser, script or style.
+        const tag = this._getRelevantTag(line, index + 1, filepath);
+        if (tag) {
+          // If a tag was found, remove the tag form the line...
+          const rest = line.replace(tag.statement, '').trim();
+          /**
+           * And if the line still has content, and no tag is currently open, or another tag
+           * with the same name is open, or the tag that was removed is for closing the opened
+           * tag... consider it markup.
+           * Like the counters, this is for edge cases.
+           */
+          if (
+            rest &&
+            (!currentOpenTag || currentOpenTag.name !== tag.name || tag.closing)
+          ) {
+            markupLines.push(rest);
+          }
+          if (currentOpenTag) {
+            // If a tag is currently open...
+            if (currentOpenTag.name === tag.name && tag.closing) {
+              // And the tag found is for closing it...
+              if (ignoreNextCounters[tag.name]) {
+                // If the counter is not `0`, decrement it and ignore the tag, just save the line.
+                ignoreNextCounters[tag.name]--;
+                currentLines.push(line);
+              } else {
+                /**
+                 * But if it's an actual closing tag, save all the accumulated lines, its reference
+                 * and reset the accumulator.
+                 */
+                result[currentOpenTag.name].push({
+                  tag: currentOpenTag,
+                  content: currentLines.join('\n'),
+                });
+                currentOpenTag = null;
+                currentLines = [];
+              }
             } else {
-              /**
-               * But if it's an actual closing tag, save all the accumulated lines, its reference
-               * and reset the accumulator.
-               */
-              result[currentOpenTag.name].push({
-                tag: currentOpenTag,
-                content: currentLines.join('\n'),
-              });
-              currentOpenTag = null;
-              currentLines = [];
+              // But if the tag is not the one for closing, ignore it and save the line.
+              if (currentOpenTag.name === tag.name) {
+                ignoreNextCounters[tag.name]++;
+              }
+              currentLines.push(line);
             }
           } else {
-            // But if the tag is not the one for closing, ignore it and save the line.
-            if (currentOpenTag.name === tag.name) {
-              ignoreNextCounters[tag.name]++;
-            }
-            currentLines.push(line);
+            // If no tag is open, send all the accumulated lines to the markup and open the tag.
+            markupLines.push(...currentLines);
+            currentLines = [];
+            currentOpenTag = tag;
           }
         } else {
-          // If no tag is open, send all the accumulated lines to the markup and open the tag.
-          markupLines.push(...currentLines);
-          currentLines = [];
-          currentOpenTag = tag;
+          // If no tag was found, just save the line.
+          currentLines.push(line);
         }
-      } else {
-        // If no tag was found, just save the line.
-        currentLines.push(line);
-      }
-    });
+      });
 
     // All lines that are not inside a tag, go to the markup.
     if (currentLines.length) {
@@ -326,18 +344,17 @@ class SFCParser {
     }
 
     // Remove empty lines from the markup and transform it into text.
-    result.markup = markupLines
-    .filter((line) => !!line.trim())
-    .join('\n');
+    result.markup = markupLines.filter((line) => !!line.trim()).join('\n');
 
     return result;
   }
   /**
    * Finds a relevant tag for the parser on a line of code.
-   * @param {String} line        The line to parse.
-   * @param {Number} lineNumber  The number of the line, on the SFC.
-   * @param {String} filepath    The path of the SFC.
-   * @return {?SFCParserResultTag}
+   *
+   * @param {string} line        The line to parse.
+   * @param {number} lineNumber  The number of the line, on the SFC.
+   * @param {string} filepath    The path of the SFC.
+   * @returns {?SFCParserResultTag}
    * @throws {Error} If it finds two relevant tags (style/script) on the same line.
    * @access protected
    * @ignore
@@ -374,8 +391,9 @@ class SFCParser {
   }
   /**
    * Finds and parses the information of an `<extend />` tag on a SFC.
-   * @param {String} contents The contents of the SFC.
-   * @return {?SFCParserExtendTag}
+   *
+   * @param {string} contents  The contents of the SFC.
+   * @returns {?SFCParserExtendTag}
    * @access protected
    * @ignore
    */
@@ -397,16 +415,20 @@ class SFCParser {
   }
   /**
    * Parses a string of HTML tag attributes into an object.
-   * If an attribute doesn't have a value, its value will be `true` (boolean, no string); and
-   * if a value is a string for a boolean (`'true'` or `'false'`), it will become a real boolean.
-   * @example
-   * console.log(parser._getTagAttributes('from="file" html'));
-   * // { from: 'file', html: true }
-   * console.log(parser._getTagAttributes('from="file" html="false"'));
-   * // { from: 'file', html: false }
-   * @param {String} rawAttributes The attributes to parse.
-   * @return {Object}
+   * If an attribute doesn't have a value, its value will be `true` (boolean, no string);
+   * and if a value is a string for a boolean (`'true'` or `'false'`), it will become a
+   * real boolean.
+   *
+   * @param {string} rawAttributes  The attributes to parse.
+   * @returns {Object}
    * @access protected
+   * @example
+   *
+   *   console.log(parser._getTagAttributes('from="file" html'));
+   *   // { from: 'file', html: true }
+   *   console.log(parser._getTagAttributes('from="file" html="false"'));
+   *   // { from: 'file', html: false }
+   *
    * @ignore
    */
   _getTagAttributes(rawAttributes) {
@@ -433,8 +455,9 @@ class SFCParser {
   }
 }
 /**
- * The service provider that once registered on {@link SvelteExtend} will save the an instance of
- * {@link SFCParser} as the `sfcParser` service.
+ * The service provider that once registered on {@link SvelteExtend} will save the an
+ * instance of {@link SFCParser} as the `sfcParser` service.
+ *
  * @type {Provider}
  */
 const sfcParser = provider((app) => {

@@ -96,8 +96,9 @@ describe('SFCData', () => {
     // When/Then
     sut = SFCData.new('some/other/file/path.svelte');
     sut.addBaseFileData(SFCData.new('some/file/path.svelte'));
-    expect(() => sut.addBaseFileData(SFCData.new('some/file/path.svelte')))
-    .toThrow(/You can't add more than one base file data/i);
+    expect(() => sut.addBaseFileData(SFCData.new('some/file/path.svelte'))).toThrow(
+      /You can't add more than one base file data/i,
+    );
   });
 
   it('should throw an error when trying to add data from an invalid object', () => {
@@ -343,12 +344,7 @@ describe('SFCData', () => {
     const markup = '<marquee>woooo</marquee>';
     let sut = null;
     let result = null;
-    const expectedResult = [
-      '<style>',
-      styleData.content,
-      '</style>',
-      markup,
-    ].join('\n');
+    const expectedResult = ['<style>', styleData.content, '</style>', markup].join('\n');
     // When
     sut = SFCData.new('some/other/file/path.svelte');
     sut.addStyle(styleData.content);
