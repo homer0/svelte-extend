@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8" />
+    <title>app/index.js - svelte-extend docs</title>
+    
+    
+    
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css" />
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+    <link rel="shortcut icon" href="icons/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="48x48" href="icons/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/favicon-72.png" />
+    <link rel="apple-touch-icon" sizes="96x96" href="icons/favicon-96.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/favicon-144.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/favicon-192.png" />
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/favicon-256.png" />
+    <link rel="apple-touch-icon" sizes="384x384" href="icons/favicon-384.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/favicon-512.png" />
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html" class="home-link">svelte-extend</a></h2><ul class="ref-links">
+            <li><a
+                class="ref-link -yarn"
+                title="View the package on Yarn"
+                href="https://yarnpkg.com/package/svelte-extend"
+                target="_blank"
+            >View the package on Yarn</a></li>
+        
+
+            <li><a
+                class="ref-link -github"
+                title="Go to the GitHub repository"
+                href="https://github.com/homer0/svelte-extend"
+                target="_blank"
+            >Go to the GitHub repository</a></li>
+        
+
+            <li><a
+                class="ref-link -npm"
+                title="View the package on NPM"
+                href="https://www.npmjs.com/package/svelte-extend"
+                target="_blank"
+            >View the package on NPM</a></li>
+        </ul><h3>Global</h3><ul><li><a href="global.html#extender">extender</a></li><li><a href="global.html#jsMerger">jsMerger</a></li><li><a href="global.html#sfcData">sfcData</a></li><li><a href="global.html#sfcParser">sfcParser</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">app/index.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const fs = require('fs-extra');
+const Jimple = require('jimple');
+
+const { appLogger } = require('wootils/node/logger');
+const services = require('../services');
+/**
+ * The application main interface and dependency injection container.
+ *
+ * @augments {Jimple}
+ */
+class SvelteExtend extends Jimple {
+  /**
+   * @ignore
+   */
+  constructor() {
+    super();
+
+    this.register(appLogger);
+    this.register(services.extender);
+    this.register(services.jsMerger);
+    this.register(services.sfcData);
+    this.register(services.sfcParser);
+  }
+  /**
+   * Extends an Svelte single file component that implements the `&lt;extend />` tag.
+   *
+   * @param {string} contents      The contents of the file.
+   * @param {string} filepath      The path of the file.
+   * @param {number} [maxDepth=0]  How many components can be extended. For example, if a
+   *                               file extends from one that extends from another and the
+   *                               parameter is set to `1`, the parsing will fail.
+   * @returns {Promise&lt;?string, Error>} If the file doesn't implement the `&lt;extend />`
+   *                                    tag, the promise will resolve with `null`.
+   */
+  extend(contents, filepath, maxDepth = 0) {
+    return this.get('sfcParser')
+      .parse(contents, filepath, maxDepth)
+      .then((sfc) =>
+        sfc === null ? contents : this.get('extender').generate(sfc).render(),
+      );
+  }
+  /**
+   * Extends an Svelte single file component that implements the `&lt;extend />` tag by using
+   * just its path; once the file is loaded, the method will internally call
+   * {@link SvelteExtend#extend}.
+   *
+   * @param {string} filepath      The path of the file.
+   * @param {number} [maxDepth=0]  How many components can be extended. For example, if a
+   *                               file extends from one that extends from another and the
+   *                               parameter is set to `1`, the parsing will fail.
+   * @returns {Promise&lt;?string, Error>} If the file doesn't implement the `&lt;extend />`
+   *                                    tag, the promise will resolve with `null`.
+   */
+  extendFromPath(filepath, maxDepth = 0) {
+    return fs
+      .readFile(filepath, 'utf-8')
+      .then((contents) => this.extend(contents, filepath, maxDepth));
+  }
+}
+
+module.exports = SvelteExtend;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> using a forked <a href="https://github.com/homer0/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

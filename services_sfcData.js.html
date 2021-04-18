@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8" />
+    <title>services/sfcData.js - svelte-extend docs</title>
+    
+    
+    
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css" />
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css" />
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no" />
+    <link rel="shortcut icon" href="icons/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="48x48" href="icons/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="icons/favicon-72.png" />
+    <link rel="apple-touch-icon" sizes="96x96" href="icons/favicon-96.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/favicon-144.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="icons/favicon-192.png" />
+    <link rel="apple-touch-icon" sizes="256x256" href="icons/favicon-256.png" />
+    <link rel="apple-touch-icon" sizes="384x384" href="icons/favicon-384.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="icons/favicon-512.png" />
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html" class="home-link">svelte-extend</a></h2><ul class="ref-links">
+            <li><a
+                class="ref-link -yarn"
+                title="View the package on Yarn"
+                href="https://yarnpkg.com/package/svelte-extend"
+                target="_blank"
+            >View the package on Yarn</a></li>
+        
+
+            <li><a
+                class="ref-link -github"
+                title="Go to the GitHub repository"
+                href="https://github.com/homer0/svelte-extend"
+                target="_blank"
+            >Go to the GitHub repository</a></li>
+        
+
+            <li><a
+                class="ref-link -npm"
+                title="View the package on NPM"
+                href="https://www.npmjs.com/package/svelte-extend"
+                target="_blank"
+            >View the package on NPM</a></li>
+        </ul><h3>Global</h3><ul><li><a href="global.html#extender">extender</a></li><li><a href="global.html#jsMerger">jsMerger</a></li><li><a href="global.html#sfcData">sfcData</a></li><li><a href="global.html#sfcParser">sfcParser</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">services/sfcData.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const path = require('path');
+const { provider } = require('jimple');
+/**
+ * A basic class to handle single file components' (SFC) data and rendering for the app.
+ */
+class SFCData {
+  /**
+   * A shorthand to create a new instance of the class.
+   *
+   * @param {string} filepath  The file path of the component for which the data will be
+   *                           saved. This is later used when merging components in order
+   *                           to fix relative paths between files.
+   * @returns {SFCData}
+   * @static
+   */
+  static new(filepath) {
+    return new SFCData(filepath);
+  }
+  /**
+   * @param {string} filepath  The file path of the component for which the data will be
+   *                           saved. This is later used when merging components in order
+   *                           to fix relative paths between files.
+   */
+  constructor(filepath) {
+    /**
+     * The path of the SFC.
+     *
+     * @type {string}
+     * @access protected
+     * @ignore
+     */
+    this._filepath = filepath;
+    /**
+     * The directory where the SFC is located.
+     *
+     * @type {string}
+     * @access protected
+     * @ignore
+     */
+    this._directory = path.dirname(this._filepath);
+    /**
+     * The HTML markup of the SFC; this doesn't include scripts and styles.
+     *
+     * @type {string}
+     * @access protected
+     * @ignore
+     */
+    this._markup = '';
+    /**
+     * The list of script tags the SFC has.
+     *
+     * @type {SFCTag[]}
+     * @access protected
+     * @ignore
+     */
+    this._scripts = [];
+    /**
+     * The list of module script tags (those with the `context="module"` attribute) the
+     * SFC has.
+     *
+     * @type {SFCTag[]}
+     * @access protected
+     * @ignore
+     */
+    this._moduleScripts = [];
+    /**
+     * The list of style tags the SFC has.
+     *
+     * @type {SFCTag[]}
+     * @access protected
+     * @ignore
+     */
+    this._styles = [];
+    /**
+     * In case the SFC extends another SFC, this will be a reference for it.
+     *
+     * @type {?SFCData}
+     * @access protected
+     * @ignore
+     */
+    this._baseFile = null;
+    /**
+     * In case the SFC extends another SFC, this dictionary will contain the information
+     * of the `&lt;extend />` tag.
+     *
+     * @type {Object}
+     * @access protected
+     * @ignore
+     */
+    this._extendTagAttributes = {};
+  }
+  /**
+   * Adds the information of a SFC this one is extending.
+   *
+   * @param {SFCData} fileData             The SFC information.
+   * @param {Object}  extendTagAttributes  The attributes of this SFC `&lt;extend />` tag.
+   * @throws {Error} If this SFC already has a base SFC already set.
+   * @throws {Error} If the `fileData` is not an instance of {@link SFCData}.
+   */
+  addBaseFileData(fileData, extendTagAttributes = {}) {
+    if (this._baseFile) {
+      throw new Error("You can't add more than one base file data");
+    } else if (!(fileData instanceof SFCData)) {
+      throw new Error('`fileData` must be an instance of SFCData');
+    }
+
+    this._baseFile = fileData;
+    this._extendTagAttributes = extendTagAttributes;
+  }
+  /**
+   * Adds HTML markup for the SFC. If there's already markup saved, it will just append
+   * it.
+   *
+   * @param {string} content  The HTML code to add.
+   */
+  addMarkup(content) {
+    const newMarkup = this._markup ? `${this._markup}\n${content}` : content;
+    this._markup = newMarkup;
+  }
+  /**
+   * Adds a script tag information to the SFC.
+   *
+   * @param {string} content     The contents of the tag.
+   * @param {Object} attributes  A dictionary with the tag attributes.
+   */
+  addScript(content, attributes = {}) {
+    const list = attributes.context === 'module' ? this._moduleScripts : this._scripts;
+    list.push({
+      content,
+      attributes,
+    });
+  }
+  /**
+   * Adds a style tag information to the SFC.
+   *
+   * @param {string} content     The contents of the tag.
+   * @param {Object} attributes  A dictionary with the tag attributes.
+   */
+  addStyle(content, attributes = {}) {
+    this._styles.push({
+      content,
+      attributes,
+    });
+  }
+  /**
+   * Renders the whole SFC information into a string, so it can be saved on a file.
+   *
+   * @returns {string}
+   */
+  render() {
+    const lines = [];
+    if (this.hasModuleScripts) {
+      lines.push(this._renderTag('script', this.moduleScript));
+    }
+
+    if (this.hasScripts) {
+      lines.push(this._renderTag('script', this.script));
+    }
+
+    if (this.hasStyles) {
+      lines.push(this._renderTag('style', this.style));
+    }
+
+    lines.push(this.markup);
+    return lines.join('\n');
+  }
+  /**
+   * In case the SFC extends another SFC, this will be a reference for it.
+   *
+   * @type {?SFCData}
+   */
+  get baseFileData() {
+    return this._baseFile;
+  }
+  /**
+   * The directory where the SFC is located.
+   *
+   * @type {string}
+   */
+  get directory() {
+    return this._directory;
+  }
+  /**
+   * In case the SFC extends another SFC, this dictionary will contain the information of
+   * the `&lt;extend />` tag.
+   *
+   * @type {Object}
+   */
+  get extendTagAttributes() {
+    return this._extendTagAttributes;
+  }
+  /**
+   * The path of the SFC.
+   *
+   * @type {string}
+   */
+  get filepath() {
+    return this._filepath;
+  }
+  /**
+   * Whether or not the SFC extends another SFC.
+   *
+   * @type {boolean}
+   */
+  get hasBaseFileData() {
+    return this._baseFile !== null;
+  }
+  /**
+   * Whether or not the SFC has module script tags (those with the `context="module"`
+   * attribute).
+   *
+   * @type {boolean}
+   */
+  get hasModuleScripts() {
+    return this._moduleScripts.length > 0;
+  }
+  /**
+   * Whether or not the SFC has script tags.
+   *
+   * @type {boolean}
+   */
+  get hasScripts() {
+    return this._scripts.length > 0;
+  }
+  /**
+   * Whether or not the SFC has style tags.
+   *
+   * @type {boolean}
+   */
+  get hasStyles() {
+    return this._styles.length > 0;
+  }
+  /**
+   * The HTML markup of the SFC; this doesn't include scripts and styles.
+   *
+   * @type {string}
+   */
+  get markup() {
+    return this._markup;
+  }
+  /**
+   * A single {@link SFCTag} that merges the contents and attributes of all the module
+   * scripts tags (those with the `context="module"` attribute) the SFC has.
+   *
+   * @type {SFCTag}
+   */
+  get moduleScript() {
+    const result = this._mergeTags(this._moduleScripts);
+    result.attributes.context = 'module';
+    return result;
+  }
+  /**
+   * The list of module script tags (those with the `context="module"` attribute) the SFC
+   * has.
+   *
+   * @type {SFCTag[]}
+   */
+  get moduleScripts() {
+    return this._moduleScripts;
+  }
+  /**
+   * A single {@link SFCTag} that merges the contents and attributes of all the script
+   * tags the SFC has.
+   *
+   * @type {SFCTag}
+   */
+  get script() {
+    return this._mergeTags(this._scripts);
+  }
+  /**
+   * The list of script tags the SFC has.
+   *
+   * @type {SFCTag[]}
+   */
+  get scripts() {
+    return this._scripts;
+  }
+  /**
+   * A single {@link SFCTag} that merges the contents and attributes of all the style tags
+   * the SFC has.
+   *
+   * @type {SFCTag}
+   */
+  get style() {
+    return this._mergeTags(this._styles);
+  }
+  /**
+   * The list of style tags the SFC has.
+   *
+   * @type {SFCTag[]}
+   */
+  get styles() {
+    return this._styles;
+  }
+  /**
+   * A utility method that merges a list of tags into a single one.
+   *
+   * @param {SFCTag[]} tags  The list of tags to merge.
+   * @returns {SFCTag}
+   * @access protected
+   * @ignore
+   */
+  _mergeTags(tags) {
+    let result;
+    if (tags.length === 0) {
+      result = {
+        content: '',
+        attributes: {},
+      };
+    } else if (tags.length === 1) {
+      [result] = tags;
+    } else {
+      result = tags.reduce(
+        (acc, tag) => ({
+          content: `${acc.content}\n${tag.content}`,
+          attributes: { ...acc.attributes, ...tag.attributes },
+        }),
+        {
+          content: '',
+          attributes: {},
+        },
+      );
+
+      result.content = result.content.replace(/^\n/, '');
+    }
+
+    return result;
+  }
+  /**
+   * Renders a {@link SFCTag} on a string.
+   *
+   * @param {string} name  The name of the tag (like `script` or `style`).
+   * @param {SFCTag} tag   The tag information.
+   * @returns {string}
+   * @access protected
+   * @ignore
+   */
+  _renderTag(name, tag) {
+    const attrsNames = Object.keys(tag.attributes);
+    let attrs;
+    if (attrsNames.length) {
+      attrs = attrsNames
+        .reduce((acc, attrName) => {
+          const value = tag.attributes[attrName];
+          return [...acc, `${attrName}="${value}"`];
+        }, [])
+        .join(' ');
+      attrs = ` ${attrs}`;
+    } else {
+      attrs = '';
+    }
+
+    return [`&lt;${name}${attrs}>`, tag.content, `&lt;/${name}>`].join('\n');
+  }
+}
+/**
+ * The service provider that once registered on {@link SvelteExtend} will save the class
+ * {@link SFCData} as the `sfcData` service.
+ *
+ * @type {Provider}
+ */
+const sfcData = provider((app) => {
+  app.set('sfcData', () => SFCData);
+});
+
+module.exports = {
+  SFCData,
+  sfcData,
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a> using a forked <a href="https://github.com/homer0/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>
