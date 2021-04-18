@@ -74,37 +74,35 @@ class Extender {
     return this._generate(sfc, maxDepth, 1);
   }
   /**
-   * The method that actually generates the "final SFC".
+   * Removes the {@link Extender#_privateAttributes} from a dictionary of attributes.
    *
-   * @param {SFCData} sfc           The SFC information.
-   * @param {number}  maxDepth      How many components can be extended. For example, if a
-   *                                file extends from one that extends from another and
-   *                                the parameter is set to `1`, the parsing will fail.
-   * @param {number}  currentDepth  The level of depth in which a file is currently being
-   *                                extended.
-   * @returns {SFCData}
-   * @throws {Error} If the "extend chain" goes beyond the `maxDepth` limit.
+   * @param {Object} attributes  The dictionary of attributes to clean.
+   * @returns {Object} A new dictionary without the private attributes.
    * @access protected
    * @ignore
    */
-  _generate(sfc, maxDepth, currentDepth) {
-    let result;
-    if (sfc.hasBaseFileData) {
-      const newCurrentDepth = currentDepth + 1;
-      if (maxDepth && newCurrentDepth > maxDepth) {
-        throw new Error(
-          `The file '${sfc.filepath}' can't extend from another file, the max depth ` +
-            `limit is set to ${maxDepth}`,
-        );
-      }
-
-      const base = this._generate(sfc.baseFileData, maxDepth, newCurrentDepth);
-      result = this._extend(base, sfc);
-    } else {
-      result = sfc;
-    }
+  _cleanAttributes(attributes) {
+    const result = { ...attributes };
+    this._privateAttributes.forEach((name) => {
+      delete result[name];
+    });
 
     return result;
+  }
+  /**
+   * Utility method to remove empty lines from the beginning and end of a block of code.
+   * This method exists because is common for a block to end up like this when merging its
+   * contents.
+   *
+   * @param {string} text  The text to clean.
+   * @returns {string}
+   * @access protected
+   * @ignore
+   */
+  _cleanTextBlock(text) {
+    const newText = text.replace(/^\n/, '').replace(/\n$/, '');
+
+    return newText.trim() ? newText : '';
   }
   /**
    * Generates a single SFC data object by merging a base SFC and one that extends it.
@@ -136,124 +134,6 @@ class Extender {
     }
 
     return sfc;
-  }
-  /**
-   * Generates the markup of the merge of two SFCs. If the extended SFC doesn't have the
-   * `html`
-   * attribute on its `<extend />` tag, the returned markup won't contain the one from the
-   * base SFC.
-   *
-   * @param {SFCData} base       The data of the base SFC.
-   * @param {SFCData} target     The data of the SFC that extends the base.
-   * @param {string}  directory  The relative directory path between the SFC that extends
-   *                             and the base one; this is used to update the relative
-   *                             paths on the code.
-   * @returns {string}
-   * @access protected
-   * @ignore
-   */
-  _extendMarkup(base, target, directory) {
-    let result;
-    const htmlPosition = this._getMergePosition(target.extendTagAttributes.html);
-    if (htmlPosition === null) {
-      result = target.markup;
-    } else {
-      const baseMarkup = this._updateMarkupPaths(base.markup, directory);
-      if (htmlPosition === 'after') {
-        result = `${baseMarkup}\n${target.markup}`;
-      } else {
-        result = `${target.markup}\n${baseMarkup}`;
-      }
-    }
-
-    return this._cleanTextBlock(result);
-  }
-  /**
-   * Generates an style {@link SFCTag} of the merge of two SFCs. If the extended SFC
-   * doesn't have any styling, it will use the one from the base; but if there's a style
-   * tag, it will use that instead; and if the extended style tag uses the `extend`
-   * attribute, then the content of both tags will be merged.
-   *
-   * @param {SFCData} base       The data of the base SFC.
-   * @param {SFCData} target     The data of the SFC that extends the base.
-   * @param {string}  directory  The relative directory path between the SFC that extends
-   *                             and the base one; this is used to update the relative
-   *                             paths on the code.
-   * @returns {SFCTag}
-   * @access protected
-   * @ignore
-   */
-  _extendStyle(base, target, directory) {
-    const baseStyle = base.style;
-    const targetStyle = target.style;
-    let attributes;
-    let content;
-    if (target.hasStyles) {
-      const stylePosition = this._getMergePosition(targetStyle.attributes.extend);
-      if (stylePosition === null) {
-        ({ attributes, content } = targetStyle);
-      } else {
-        attributes = Object.assign({}, baseStyle.attributes, targetStyle.attributes);
-        const newBaseStyle = this._updateCSSPaths(baseStyle.content, directory);
-        if (stylePosition === 'after') {
-          content = `${newBaseStyle}\n${targetStyle.content}`;
-        } else {
-          content = `${targetStyle.content}\n${newBaseStyle}`;
-        }
-      }
-    } else {
-      ({ attributes } = baseStyle);
-      content = this._updateCSSPaths(baseStyle.content, directory);
-    }
-
-    return {
-      attributes: this._cleanAttributes(attributes),
-      content: this._cleanTextBlock(content),
-    };
-  }
-  /**
-   * Generates an script {@link SFCTag} of the merge of two SFCs. If the extended SFC
-   * doesn't have any scripts, it will use the one from the base; but if there's a script
-   * tag, it will use that instead; and if the extended script tag uses the `extend`
-   * attribute, then the content of both tags will be merged.
-   *
-   * @param {SFCData} base       The data of the base SFC.
-   * @param {SFCData} target     The data of the SFC that extends the base.
-   * @param {string}  directory  The relative directory path between the SFC that extends
-   *                             and the base one; this is used to update the relative
-   *                             paths on the code.
-   * @returns {SFCTag}
-   * @access protected
-   * @ignore
-   */
-  _extendScript(base, target, directory) {
-    return this._extendJSBlock(base.script, target.script, target.hasScripts, directory);
-  }
-  /**
-   * Generates a module script {@link SFCTag} (the ones with the `context="module"`
-   * attribute) of the merge of two SFCs. If the extended SFC doesn't have any scripts, it
-   * will use the one from the base; but if there's a script tag, it will use that
-   * instead; and if the extended script tag uses the `extend` attribute, then the content
-   * of both tags will be merged.
-   *
-   * @param {SFCData} base       The data of the base SFC.
-   * @param {SFCData} target     The data of the SFC that extends the base.
-   * @param {string}  directory  The relative directory path between the SFC that extends
-   *                             and the base one; this is used to update the relative
-   *                             paths on the code.
-   * @returns {SFCTag}
-   * @access protected
-   * @ignore
-   */
-  _extendModuleScript(base, target, directory) {
-    const mScript = this._extendJSBlock(
-      base.moduleScript,
-      target.moduleScript,
-      target.hasModuleScripts,
-      directory,
-    );
-    mScript.attributes.context = 'module';
-    return mScript;
   }
   /**
    * This is a utility method used to merge script {@link SFCTag}s. It's used by both
@@ -288,7 +168,7 @@ class Extender {
           ({ content } = targetJS);
         }
 
-        attributes = Object.assign({}, baseJS.attributes, targetJS.attributes);
+        attributes = { ...baseJS.attributes, ...targetJS.attributes };
       } else {
         ({ attributes, content } = targetJS);
       }
@@ -303,49 +183,182 @@ class Extender {
     };
   }
   /**
-   * Updates relative paths on a block of JS code to be relative for a give directory.
-   * This is used when a block of JS code is going to be added on a extended SFC.
+   * Generates the markup of the merge of two SFCs. If the extended SFC doesn't have the
+   * `html`
+   * attribute on its `<extend />` tag, the returned markup won't contain the one from the
+   * base SFC.
    *
-   * @param {string} js         The code to update.
-   * @param {string} directory  The relative path to the directory in which the extended
-   *                            SFC is located.
+   * @param {SFCData} base       The data of the base SFC.
+   * @param {SFCData} target     The data of the SFC that extends the base.
+   * @param {string}  directory  The relative directory path between the SFC that extends
+   *                             and the base one; this is used to update the relative
+   *                             paths on the code.
    * @returns {string}
    * @access protected
    * @ignore
    */
-  _updateJSPaths(js, directory) {
-    return this._updateCodePaths(js, this._expressions.jsPaths, directory);
+  _extendMarkup(base, target, directory) {
+    let result;
+    const htmlPosition = this._getMergePosition(target.extendTagAttributes.html);
+    if (htmlPosition === null) {
+      result = target.markup;
+    } else {
+      const baseMarkup = this._updateMarkupPaths(base.markup, directory);
+      if (htmlPosition === 'after') {
+        result = `${baseMarkup}\n${target.markup}`;
+      } else {
+        result = `${target.markup}\n${baseMarkup}`;
+      }
+    }
+
+    return this._cleanTextBlock(result);
   }
   /**
-   * Updates relative paths on a block of HTML code to be relative for a give directory.
-   * This is used when a block of HTML code is going to be added on a extended SFC.
+   * Generates a module script {@link SFCTag} (the ones with the `context="module"`
+   * attribute) of the merge of two SFCs. If the extended SFC doesn't have any scripts, it
+   * will use the one from the base; but if there's a script tag, it will use that
+   * instead; and if the extended script tag uses the `extend` attribute, then the content
+   * of both tags will be merged.
    *
-   * @param {string} markup     The code to update.
-   * @param {string} directory  The relative path to the directory in which the extended
-   *                            SFC is located.
-   * @returns {string}
+   * @param {SFCData} base       The data of the base SFC.
+   * @param {SFCData} target     The data of the SFC that extends the base.
+   * @param {string}  directory  The relative directory path between the SFC that extends
+   *                             and the base one; this is used to update the relative
+   *                             paths on the code.
+   * @returns {SFCTag}
    * @access protected
    * @ignore
    */
-  _updateMarkupPaths(markup, directory) {
-    return this._updateCSSPaths(
-      this._updateCodePaths(markup, this._expressions.htmlSrc, directory),
+  _extendModuleScript(base, target, directory) {
+    const mScript = this._extendJSBlock(
+      base.moduleScript,
+      target.moduleScript,
+      target.hasModuleScripts,
       directory,
     );
+    mScript.attributes.context = 'module';
+    return mScript;
   }
   /**
-   * Updates relative paths on a block of CSS code to be relative for a give directory.
-   * This is used when a block of CSS code is going to be added on a extended SFC.
+   * Generates an script {@link SFCTag} of the merge of two SFCs. If the extended SFC
+   * doesn't have any scripts, it will use the one from the base; but if there's a script
+   * tag, it will use that instead; and if the extended script tag uses the `extend`
+   * attribute, then the content of both tags will be merged.
    *
-   * @param {string} css        The code to update.
-   * @param {string} directory  The relative path to the directory in which the extended
-   *                            SFC is located.
-   * @returns {string}
+   * @param {SFCData} base       The data of the base SFC.
+   * @param {SFCData} target     The data of the SFC that extends the base.
+   * @param {string}  directory  The relative directory path between the SFC that extends
+   *                             and the base one; this is used to update the relative
+   *                             paths on the code.
+   * @returns {SFCTag}
    * @access protected
    * @ignore
    */
-  _updateCSSPaths(css, directory) {
-    return this._updateCodePaths(css, this._expressions.cssUrl, directory);
+  _extendScript(base, target, directory) {
+    return this._extendJSBlock(base.script, target.script, target.hasScripts, directory);
+  }
+  /**
+   * Generates an style {@link SFCTag} of the merge of two SFCs. If the extended SFC
+   * doesn't have any styling, it will use the one from the base; but if there's a style
+   * tag, it will use that instead; and if the extended style tag uses the `extend`
+   * attribute, then the content of both tags will be merged.
+   *
+   * @param {SFCData} base       The data of the base SFC.
+   * @param {SFCData} target     The data of the SFC that extends the base.
+   * @param {string}  directory  The relative directory path between the SFC that extends
+   *                             and the base one; this is used to update the relative
+   *                             paths on the code.
+   * @returns {SFCTag}
+   * @access protected
+   * @ignore
+   */
+  _extendStyle(base, target, directory) {
+    const baseStyle = base.style;
+    const targetStyle = target.style;
+    let attributes;
+    let content;
+    if (target.hasStyles) {
+      const stylePosition = this._getMergePosition(targetStyle.attributes.extend);
+      if (stylePosition === null) {
+        ({ attributes, content } = targetStyle);
+      } else {
+        attributes = { ...baseStyle.attributes, ...targetStyle.attributes };
+        const newBaseStyle = this._updateCSSPaths(baseStyle.content, directory);
+        if (stylePosition === 'after') {
+          content = `${newBaseStyle}\n${targetStyle.content}`;
+        } else {
+          content = `${targetStyle.content}\n${newBaseStyle}`;
+        }
+      }
+    } else {
+      ({ attributes } = baseStyle);
+      content = this._updateCSSPaths(baseStyle.content, directory);
+    }
+
+    return {
+      attributes: this._cleanAttributes(attributes),
+      content: this._cleanTextBlock(content),
+    };
+  }
+  /**
+   * The method that actually generates the "final SFC".
+   *
+   * @param {SFCData} sfc           The SFC information.
+   * @param {number}  maxDepth      How many components can be extended. For example, if a
+   *                                file extends from one that extends from another and
+   *                                the parameter is set to `1`, the parsing will fail.
+   * @param {number}  currentDepth  The level of depth in which a file is currently being
+   *                                extended.
+   * @returns {SFCData}
+   * @throws {Error} If the "extend chain" goes beyond the `maxDepth` limit.
+   * @access protected
+   * @ignore
+   */
+  _generate(sfc, maxDepth, currentDepth) {
+    let result;
+    if (sfc.hasBaseFileData) {
+      const newCurrentDepth = currentDepth + 1;
+      if (maxDepth && newCurrentDepth > maxDepth) {
+        throw new Error(
+          `The file '${sfc.filepath}' can't extend from another file, the max depth ` +
+            `limit is set to ${maxDepth}`,
+        );
+      }
+
+      const base = this._generate(sfc.baseFileData, maxDepth, newCurrentDepth);
+      result = this._extend(base, sfc);
+    } else {
+      result = sfc;
+    }
+
+    return result;
+  }
+  /**
+   * A utility method that parses the value of an `extend` HTML attribute the class uses
+   * to determine the position of the base code in relation with the extended one:
+   * - `undefined` or `'false'`: `null` - the code won't be merged.
+   * - no value, `'true'` or `'after'`: first the base code and then the extended one.
+   * - `'before'`: first the extended code and then the base one.
+   *
+   * @param {string} [value]  The value of the `extend` HTML attribute.
+   * @returns {?string} If the attribute is not defined or if it's value is `'false'`, it
+   *                    will return `null`, indicating that the code shouldn't be merged.
+   * @access protected
+   * @ignore
+   */
+  _getMergePosition(value) {
+    const defaultValue = 'after';
+    let result;
+    const valueType = typeof value;
+    if (valueType === 'undefined' || !value) {
+      result = null;
+    } else if (valueType === 'string') {
+      result = value.match(/(?:before|after)/i) ? value.toLowerCase() : defaultValue;
+    } else {
+      result = defaultValue;
+    }
+
+    return result;
   }
   /**
    * Utility method that updates paths on a given code to make them relative to a new
@@ -383,62 +396,49 @@ class Extender {
     return newCode;
   }
   /**
-   * A utility method that parses the value of an `extend` HTML attribute the class uses
-   * to determine the position of the base code in relation with the extended one:
-   * - `undefined` or `'false'`: `null` - the code won't be merged.
-   * - no value, `'true'` or `'after'`: first the base code and then the extended one.
-   * - `'before'`: first the extended code and then the base one.
+   * Updates relative paths on a block of CSS code to be relative for a give directory.
+   * This is used when a block of CSS code is going to be added on a extended SFC.
    *
-   * @param {string} [value]  The value of the `extend` HTML attribute.
-   * @returns {?string} If the attribute is not defined or if it's value is `'false'`, it
-   *                    will return `null`, indicating that the code shouldn't be merged.
-   * @access protected
-   * @ignore
-   */
-  _getMergePosition(value) {
-    const defaultValue = 'after';
-    let result;
-    const valueType = typeof value;
-    if (valueType === 'undefined' || !value) {
-      result = null;
-    } else if (valueType === 'string') {
-      result = value.match(/(?:before|after)/i) ? value.toLowerCase() : defaultValue;
-    } else {
-      result = defaultValue;
-    }
-
-    return result;
-  }
-  /**
-   * Utility method to remove empty lines from the beginning and end of a block of code.
-   * This method exists because is common for a block to end up like this when merging its
-   * contents.
-   *
-   * @param {string} text  The text to clean.
+   * @param {string} css        The code to update.
+   * @param {string} directory  The relative path to the directory in which the extended
+   *                            SFC is located.
    * @returns {string}
    * @access protected
    * @ignore
    */
-  _cleanTextBlock(text) {
-    const newText = text.replace(/^\n/, '').replace(/\n$/, '');
-
-    return newText.trim() ? newText : '';
+  _updateCSSPaths(css, directory) {
+    return this._updateCodePaths(css, this._expressions.cssUrl, directory);
   }
   /**
-   * Removes the {@link Extender#_privateAttributes} from a dictionary of attributes.
+   * Updates relative paths on a block of JS code to be relative for a give directory.
+   * This is used when a block of JS code is going to be added on a extended SFC.
    *
-   * @param {Object} attributes  The dictionary of attributes to clean.
-   * @returns {Object} A new dictionary without the private attributes.
+   * @param {string} js         The code to update.
+   * @param {string} directory  The relative path to the directory in which the extended
+   *                            SFC is located.
+   * @returns {string}
    * @access protected
    * @ignore
    */
-  _cleanAttributes(attributes) {
-    const result = Object.assign({}, attributes);
-    this._privateAttributes.forEach((name) => {
-      delete result[name];
-    });
-
-    return result;
+  _updateJSPaths(js, directory) {
+    return this._updateCodePaths(js, this._expressions.jsPaths, directory);
+  }
+  /**
+   * Updates relative paths on a block of HTML code to be relative for a give directory.
+   * This is used when a block of HTML code is going to be added on a extended SFC.
+   *
+   * @param {string} markup     The code to update.
+   * @param {string} directory  The relative path to the directory in which the extended
+   *                            SFC is located.
+   * @returns {string}
+   * @access protected
+   * @ignore
+   */
+  _updateMarkupPaths(markup, directory) {
+    return this._updateCSSPaths(
+      this._updateCodePaths(markup, this._expressions.htmlSrc, directory),
+      directory,
+    );
   }
 }
 /**

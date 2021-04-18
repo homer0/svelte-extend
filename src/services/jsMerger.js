@@ -14,6 +14,7 @@ const { provider } = require('jimple');
  */
 
 /**
+ * @typedef {Object} JSMergerCodeData
  * @property {Object}  ast               The AST of the JS block code.
  * @property {Array}   imports           A list of all the import declarations on the
  *                                       block.
@@ -27,7 +28,6 @@ const { provider } = require('jimple');
  *                                       is not an import declaration. This is used as an
  *                                       "anchor" to move all the import declarations from
  *                                       the extend block to before this node.
- * @typdef {Object} JSMergerCodeData
  * @ignore
  */
 
@@ -98,12 +98,12 @@ class JSMerger {
    */
   _extendPaths(basePaths, extendedPaths, nameFn) {
     const pathsByName = basePaths.reduce(
-      (acc, nodePath) =>
-        Object.assign({}, acc, {
-          [nameFn(nodePath)]: {
-            base: nodePath,
-          },
-        }),
+      (acc, nodePath) => ({
+        ...acc,
+        [nameFn(nodePath)]: {
+          base: nodePath,
+        },
+      }),
       {},
     );
 
@@ -125,6 +125,18 @@ class JSMerger {
     });
   }
   /**
+   * Gets the name of a binding declaration. By "binding", it referes to the named exports
+   * Svelte uses as props/bindings/attributes for the components.
+   *
+   * @param {Object} nodePath  The AST node path object that contains the declaration.
+   * @returns {string}
+   * @access protected
+   * @ignore
+   */
+  _getBindingName(nodePath) {
+    return nodePath.node.declaration.declarations[0].id.name;
+  }
+  /**
    * Parses a block of JS code in order to get the relevant information the class needs in
    * order to do a merge.
    *
@@ -144,6 +156,7 @@ class JSMerger {
     const functions = [];
     let firstContentNode = null;
     babelTraverse(ast, {
+      // eslint-disable-next-line jsdoc/require-jsdoc
       enter: (nodePath) => {
         const isRoot = nodePath.parent && babelTypes.isProgram(nodePath.parent);
         if (babelTypes.isImportDeclaration(nodePath)) {
@@ -174,16 +187,15 @@ class JSMerger {
     };
   }
   /**
-   * Gets the name of a binding declaration. By "binding", it referes to the named exports
-   * Svelte uses as props/bindings/attributes for the components.
+   * Gets the name of a function declaration.
    *
    * @param {Object} nodePath  The AST node path object that contains the declaration.
    * @returns {string}
    * @access protected
    * @ignore
    */
-  _getBindingName(nodePath) {
-    return nodePath.node.declaration.declarations[0].id.name;
+  _getFunctionName(nodePath) {
+    return nodePath.node.id.name;
   }
   /**
    * Gets the name of a variable declaration.
@@ -195,17 +207,6 @@ class JSMerger {
    */
   _getVariableName(nodePath) {
     return nodePath.node.declarations[0].id.name;
-  }
-  /**
-   * Gets the name of a function declaration.
-   *
-   * @param {Object} nodePath  The AST node path object that contains the declaration.
-   * @returns {string}
-   * @access protected
-   * @ignore
-   */
-  _getFunctionName(nodePath) {
-    return nodePath.node.id.name;
   }
 }
 /**

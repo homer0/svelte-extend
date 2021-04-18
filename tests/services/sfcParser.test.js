@@ -1,4 +1,6 @@
+/* eslint-disable max-classes-per-file */
 jest.mock('fs-extra');
+// eslint-disable-next-line global-require
 jest.mock('jimple', () => require('../mocks/jimple.mock'));
 jest.unmock('../../src/services/sfcParser');
 

@@ -165,12 +165,12 @@ class SFCData {
     return lines.join('\n');
   }
   /**
-   * The path of the SFC.
+   * In case the SFC extends another SFC, this will be a reference for it.
    *
-   * @type {string}
+   * @type {?SFCData}
    */
-  get filepath() {
-    return this._filepath;
+  get baseFileData() {
+    return this._baseFile;
   }
   /**
    * The directory where the SFC is located.
@@ -179,22 +179,6 @@ class SFCData {
    */
   get directory() {
     return this._directory;
-  }
-  /**
-   * Whether or not the SFC extends another SFC.
-   *
-   * @type {boolean}
-   */
-  get hasBaseFileData() {
-    return this._baseFile !== null;
-  }
-  /**
-   * In case the SFC extends another SFC, this will be a reference for it.
-   *
-   * @type {?SFCData}
-   */
-  get baseFileData() {
-    return this._baseFile;
   }
   /**
    * In case the SFC extends another SFC, this dictionary will contain the information of
@@ -206,62 +190,20 @@ class SFCData {
     return this._extendTagAttributes;
   }
   /**
-   * The HTML markup of the SFC; this doesn't include scripts and styles.
+   * The path of the SFC.
    *
    * @type {string}
    */
-  get markup() {
-    return this._markup;
+  get filepath() {
+    return this._filepath;
   }
   /**
-   * Whether or not the SFC has style tags.
+   * Whether or not the SFC extends another SFC.
    *
    * @type {boolean}
    */
-  get hasStyles() {
-    return this._styles.length > 0;
-  }
-  /**
-   * The list of style tags the SFC has.
-   *
-   * @type {SFCTag[]}
-   */
-  get styles() {
-    return this._styles;
-  }
-  /**
-   * A single {@link SFCTag} that merges the contents and attributes of all the style tags
-   * the SFC has.
-   *
-   * @type {SFCTag}
-   */
-  get style() {
-    return this._mergeTags(this._styles);
-  }
-  /**
-   * Whether or not the SFC has script tags.
-   *
-   * @type {boolean}
-   */
-  get hasScripts() {
-    return this._scripts.length > 0;
-  }
-  /**
-   * The list of script tags the SFC has.
-   *
-   * @type {SFCTag[]}
-   */
-  get scripts() {
-    return this._scripts;
-  }
-  /**
-   * A single {@link SFCTag} that merges the contents and attributes of all the script
-   * tags the SFC has.
-   *
-   * @type {SFCTag}
-   */
-  get script() {
-    return this._mergeTags(this._scripts);
+  get hasBaseFileData() {
+    return this._baseFile !== null;
   }
   /**
    * Whether or not the SFC has module script tags (those with the `context="module"`
@@ -273,13 +215,28 @@ class SFCData {
     return this._moduleScripts.length > 0;
   }
   /**
-   * The list of module script tags (those with the `context="module"` attribute) the SFC
-   * has.
+   * Whether or not the SFC has script tags.
    *
-   * @type {SFCTag[]}
+   * @type {boolean}
    */
-  get moduleScripts() {
-    return this._moduleScripts;
+  get hasScripts() {
+    return this._scripts.length > 0;
+  }
+  /**
+   * Whether or not the SFC has style tags.
+   *
+   * @type {boolean}
+   */
+  get hasStyles() {
+    return this._styles.length > 0;
+  }
+  /**
+   * The HTML markup of the SFC; this doesn't include scripts and styles.
+   *
+   * @type {string}
+   */
+  get markup() {
+    return this._markup;
   }
   /**
    * A single {@link SFCTag} that merges the contents and attributes of all the module
@@ -291,6 +248,49 @@ class SFCData {
     const result = this._mergeTags(this._moduleScripts);
     result.attributes.context = 'module';
     return result;
+  }
+  /**
+   * The list of module script tags (those with the `context="module"` attribute) the SFC
+   * has.
+   *
+   * @type {SFCTag[]}
+   */
+  get moduleScripts() {
+    return this._moduleScripts;
+  }
+  /**
+   * A single {@link SFCTag} that merges the contents and attributes of all the script
+   * tags the SFC has.
+   *
+   * @type {SFCTag}
+   */
+  get script() {
+    return this._mergeTags(this._scripts);
+  }
+  /**
+   * The list of script tags the SFC has.
+   *
+   * @type {SFCTag[]}
+   */
+  get scripts() {
+    return this._scripts;
+  }
+  /**
+   * A single {@link SFCTag} that merges the contents and attributes of all the style tags
+   * the SFC has.
+   *
+   * @type {SFCTag}
+   */
+  get style() {
+    return this._mergeTags(this._styles);
+  }
+  /**
+   * The list of style tags the SFC has.
+   *
+   * @type {SFCTag[]}
+   */
+  get styles() {
+    return this._styles;
   }
   /**
    * A utility method that merges a list of tags into a single one.
@@ -313,7 +313,7 @@ class SFCData {
       result = tags.reduce(
         (acc, tag) => ({
           content: `${acc.content}\n${tag.content}`,
-          attributes: Object.assign({}, acc.attributes, tag.attributes),
+          attributes: { ...acc.attributes, ...tag.attributes },
         }),
         {
           content: '',

@@ -1,3 +1,4 @@
+// eslint-disable-next-line global-require
 jest.mock('jimple', () => require('../mocks/jimple.mock'));
 jest.mock('babylon');
 jest.mock('@babel/traverse');

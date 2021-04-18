@@ -2,7 +2,7 @@ const rollupUtils = require('@rollup/pluginutils');
 const app = require('./index');
 
 /**
- * @typedef {function} RollupFilter
+ * @callback RollupFilter
  * @param {string} filepath  The path to validate.
  * @returns {boolean} Whether or not the path is valid.
  */
@@ -52,14 +52,12 @@ class SvelteExtendRollupPlugin {
      * @access protected
      * @ignore
      */
-    this._options = Object.assign(
-      {
-        allowedMaxDepth: 0,
-        include: [],
-        exclude: [],
-      },
-      options,
-    );
+    this._options = {
+      allowedMaxDepth: 0,
+      include: [],
+      exclude: [],
+      ...options,
+    };
     /**
      * The plugin instance's name.
      *
@@ -97,20 +95,20 @@ class SvelteExtendRollupPlugin {
     return result;
   }
   /**
-   * The plugin options.
-   *
-   * @type {SvelteExtendRollupPluginOptions}
-   */
-  get options() {
-    return this._options;
-  }
-  /**
    * The plugin instance's name.
    *
    * @type {string}
    */
   get name() {
     return this._name;
+  }
+  /**
+   * The plugin options.
+   *
+   * @type {SvelteExtendRollupPluginOptions}
+   */
+  get options() {
+    return this._options;
   }
 }
 

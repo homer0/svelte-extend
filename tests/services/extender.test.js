@@ -1,4 +1,5 @@
-jest.mock('jimple', () => require('../../tests/mocks/jimple.mock'));
+// eslint-disable-next-line global-require
+jest.mock('jimple', () => require('../mocks/jimple.mock'));
 jest.unmock('../../src/services/extender');
 
 const path = require('path');
@@ -121,7 +122,7 @@ describe('Extender', () => {
     const sfcData = 'sfcData';
     const { base, target } = getSFCs();
     base.hasBaseFileData = true;
-    base.baseFileData = Object.assign({}, target);
+    base.baseFileData = { ...target };
     const maxDepth = 1;
     let sut = null;
     // When/Then
@@ -464,12 +465,10 @@ describe('Extender', () => {
       base.moduleScript.attributes,
     );
     expect(newData.addStyle).toHaveBeenCalledTimes(1);
-    expect(newData.addStyle).toHaveBeenCalledWith(
-      target.style.content,
-      Object.assign({}, target.style.attributes, {
-        extend: undefined,
-      }),
-    );
+    expect(newData.addStyle).toHaveBeenCalledWith(target.style.content, {
+      ...target.style.attributes,
+      extend: undefined,
+    });
   });
 
   it('should extend a SFC and keep the original styling', () => {
@@ -510,9 +509,11 @@ describe('Extender', () => {
     expect(newData.addStyle).toHaveBeenCalledTimes(1);
     expect(newData.addStyle).toHaveBeenCalledWith(
       `${base.style.content}\n${target.style.content}`,
-      Object.assign({}, base.style.attributes, target.style.attributes, {
+      {
+        ...base.style.attributes,
+        ...target.style.attributes,
         extend: undefined,
-      }),
+      },
     );
   });
 
@@ -558,12 +559,11 @@ describe('Extender', () => {
       base.moduleScript.attributes,
     );
     expect(newData.addStyle).toHaveBeenCalledTimes(1);
-    expect(newData.addStyle).toHaveBeenCalledWith(
-      expectedStyling,
-      Object.assign({}, base.style.attributes, target.style.attributes, {
-        extend: undefined,
-      }),
-    );
+    expect(newData.addStyle).toHaveBeenCalledWith(expectedStyling, {
+      ...base.style.attributes,
+      ...target.style.attributes,
+      extend: undefined,
+    });
   });
 
   it('should extend a SFC and keep the original styling after the extended', () => {
@@ -604,9 +604,11 @@ describe('Extender', () => {
     expect(newData.addStyle).toHaveBeenCalledTimes(1);
     expect(newData.addStyle).toHaveBeenCalledWith(
       `${target.style.content}\n${base.style.content}`,
-      Object.assign({}, base.style.attributes, target.style.attributes, {
+      {
+        ...base.style.attributes,
+        ...target.style.attributes,
         extend: undefined,
-      }),
+      },
     );
   });
 
@@ -722,12 +724,11 @@ describe('Extender', () => {
       base.script.content,
       base.script.attributes,
     );
-    expect(newData.addScript).toHaveBeenCalledWith(
-      target.moduleScript.content,
-      Object.assign({}, base.moduleScript.attributes, target.moduleScript.attributes, {
-        extend: undefined,
-      }),
-    );
+    expect(newData.addScript).toHaveBeenCalledWith(target.moduleScript.content, {
+      ...base.moduleScript.attributes,
+      ...target.moduleScript.attributes,
+      extend: undefined,
+    });
     expect(newData.addStyle).toHaveBeenCalledTimes(1);
     expect(newData.addStyle).toHaveBeenCalledWith(
       base.style.content,
@@ -770,12 +771,11 @@ describe('Extender', () => {
       base.script.content,
       base.script.attributes,
     );
-    expect(newData.addScript).toHaveBeenCalledWith(
-      merged,
-      Object.assign({}, base.moduleScript.attributes, target.moduleScript.attributes, {
-        extend: undefined,
-      }),
-    );
+    expect(newData.addScript).toHaveBeenCalledWith(merged, {
+      ...base.moduleScript.attributes,
+      ...target.moduleScript.attributes,
+      extend: undefined,
+    });
     expect(newData.addStyle).toHaveBeenCalledTimes(1);
     expect(newData.addStyle).toHaveBeenCalledWith(
       base.style.content,
@@ -897,12 +897,11 @@ describe('Extender', () => {
     expect(newData.addMarkup).toHaveBeenCalledTimes(1);
     expect(newData.addMarkup).toHaveBeenCalledWith(target.markup);
     expect(newData.addScript).toHaveBeenCalledTimes(2);
-    expect(newData.addScript).toHaveBeenCalledWith(
-      target.script.content,
-      Object.assign({}, base.script.attributes, target.script.attributes, {
-        extend: undefined,
-      }),
-    );
+    expect(newData.addScript).toHaveBeenCalledWith(target.script.content, {
+      ...base.script.attributes,
+      ...target.script.attributes,
+      extend: undefined,
+    });
     expect(newData.addScript).toHaveBeenCalledWith(
       base.moduleScript.content,
       base.moduleScript.attributes,
@@ -944,12 +943,11 @@ describe('Extender', () => {
     expect(newData.addMarkup).toHaveBeenCalledTimes(1);
     expect(newData.addMarkup).toHaveBeenCalledWith(target.markup);
     expect(newData.addScript).toHaveBeenCalledTimes(2);
-    expect(newData.addScript).toHaveBeenCalledWith(
-      merged,
-      Object.assign({}, base.script.attributes, target.script.attributes, {
-        extend: undefined,
-      }),
-    );
+    expect(newData.addScript).toHaveBeenCalledWith(merged, {
+      ...base.script.attributes,
+      ...target.script.attributes,
+      extend: undefined,
+    });
     expect(newData.addScript).toHaveBeenCalledWith(
       base.moduleScript.content,
       base.moduleScript.attributes,
@@ -999,12 +997,11 @@ describe('Extender', () => {
     expect(newData.addMarkup).toHaveBeenCalledTimes(1);
     expect(newData.addMarkup).toHaveBeenCalledWith(target.markup);
     expect(newData.addScript).toHaveBeenCalledTimes(2);
-    expect(newData.addScript).toHaveBeenCalledWith(
-      expectedScript,
-      Object.assign({}, base.script.attributes, target.script.attributes, {
-        extend: undefined,
-      }),
-    );
+    expect(newData.addScript).toHaveBeenCalledWith(expectedScript, {
+      ...base.script.attributes,
+      ...target.script.attributes,
+      extend: undefined,
+    });
     expect(newData.addScript).toHaveBeenCalledWith(
       base.moduleScript.content,
       base.moduleScript.attributes,
@@ -1054,12 +1051,11 @@ describe('Extender', () => {
     expect(newData.addMarkup).toHaveBeenCalledTimes(1);
     expect(newData.addMarkup).toHaveBeenCalledWith(target.markup);
     expect(newData.addScript).toHaveBeenCalledTimes(2);
-    expect(newData.addScript).toHaveBeenCalledWith(
-      expectedScript,
-      Object.assign({}, base.script.attributes, target.script.attributes, {
-        extend: undefined,
-      }),
-    );
+    expect(newData.addScript).toHaveBeenCalledWith(expectedScript, {
+      ...base.script.attributes,
+      ...target.script.attributes,
+      extend: undefined,
+    });
     expect(newData.addScript).toHaveBeenCalledWith(
       base.moduleScript.content,
       base.moduleScript.attributes,

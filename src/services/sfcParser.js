@@ -27,9 +27,9 @@ const fs = require('fs-extra');
  */
 
 /**
+ * @typedef {Object} SFCParserExtendTag
  * @property {string} statement   The tag full statement (match) for the tag.
  * @property {Object} attributes  A dictionary with the tag attributes.
- * @typdef {Object} SFCParserExtendTag
  * @ignore
  */
 
@@ -101,6 +101,164 @@ class SFCParser {
     return fs
       .readFile(filepath, 'utf-8')
       .then((contents) => this.parse(contents, filepath, maxDepth));
+  }
+  /**
+   * Creates an instance of {@link SFCData} with the parsed results of an SFC.
+   *
+   * @param {string}           filepath       The path of the SFC.
+   * @param {SFCParserResults} parsedResults  The information obtained from parsing the
+   *                                          SFC.
+   * @returns {SFCData}
+   * @access protected
+   * @ignore
+   */
+  _createDataObject(filepath, parsedResults) {
+    const data = this._sfcData.new(filepath);
+    data.addMarkup(parsedResults.markup);
+    parsedResults.script.forEach((script) => {
+      const { tag, content } = script;
+      data.addScript(content, tag.attributes);
+    });
+
+    parsedResults.style.forEach((style) => {
+      const { tag, content } = style;
+      data.addStyle(content, tag.attributes);
+    });
+
+    return data;
+  }
+  /**
+   * Finds and parses the information of an `<extend />` tag on a SFC.
+   *
+   * @param {string} contents  The contents of the SFC.
+   * @returns {?SFCParserExtendTag}
+   * @access protected
+   * @ignore
+   */
+  _getExtendTag(contents) {
+    let result;
+    const match = this._expressions.extendTag.exec(contents);
+    if (match) {
+      const [statement, rawAttributes] = match;
+      const attributes = this._getTagAttributes(rawAttributes);
+      result = {
+        statement,
+        attributes,
+      };
+    } else {
+      result = null;
+    }
+
+    return result;
+  }
+  /**
+   * Finds a relevant tag for the parser on a line of code.
+   *
+   * @param {string} line        The line to parse.
+   * @param {number} lineNumber  The number of the line, on the SFC.
+   * @param {string} filepath    The path of the SFC.
+   * @returns {?SFCParserResultTag}
+   * @throws {Error} If it finds two relevant tags (style/script) on the same line.
+   * @access protected
+   * @ignore
+   */
+  _getRelevantTag(line, lineNumber, filepath) {
+    let result;
+    const match = this._expressions.relevantTags.exec(line);
+    if (match) {
+      const [statement, slash, tagName, rawAttributes] = match;
+      const name = tagName.trim();
+      const closing = typeof slash !== 'undefined';
+      const attributes = this._getTagAttributes(rawAttributes);
+      result = {
+        statement,
+        name,
+        closing,
+        attributes,
+      };
+
+      if (this._expressions.relevantTags.exec(line)) {
+        const errorMessage = [
+          'The parser cant handle multiple script/style tags on the same line (sorry!)',
+          `- file: ${filepath}`,
+          `- line: ${lineNumber}`,
+          `- code: ${line}`,
+        ].join('\n');
+        throw new Error(errorMessage);
+      }
+    } else {
+      result = null;
+    }
+
+    return result;
+  }
+  /**
+   * Parses a string of HTML tag attributes into an object.
+   * If an attribute doesn't have a value, its value will be `true` (boolean, no string);
+   * and if a value is a string for a boolean (`'true'` or `'false'`), it will become a
+   * real boolean.
+   *
+   * @param {string} rawAttributes  The attributes to parse.
+   * @returns {Object}
+   * @access protected
+   * @example
+   *
+   *   console.log(parser._getTagAttributes('from="file" html'));
+   *   // { from: 'file', html: true }
+   *   console.log(parser._getTagAttributes('from="file" html="false"'));
+   *   // { from: 'file', html: false }
+   *
+   * @ignore
+   */
+  _getTagAttributes(rawAttributes) {
+    const result = {};
+    let match = this._expressions.attributes.exec(rawAttributes);
+    while (match) {
+      let [, name, value] = match;
+      name = name.trim();
+      if (value) {
+        value = value.trim();
+        if (value.match(this._expressions.boolean)) {
+          value = value.toLowerCase() === 'true';
+        }
+      } else {
+        value = true;
+      }
+
+      result[name] = value;
+
+      match = this._expressions.attributes.exec(rawAttributes);
+    }
+
+    return result;
+  }
+  /**
+   * Loads a SFC and checks if it implements an `<extend />` tag; if it does, it calls
+   * {@link SFCParser#_parse} to parse its "base SFC" first; otherwise, it parses its
+   * contents directly.
+   *
+   * @param {string} filepath      The path of the file.
+   * @param {number} maxDepth      How many components can be extended. For example, if a
+   *                               file extends from one that extends from another and the
+   *                               parameter is set to `1`, the parsing will fail.
+   * @param {number} currentDepth  The level of depth in which a file is currently being
+   *                               extended.
+   * @returns {Promise<SFCData | SFCParserResults, Error>}
+   * @access protected
+   * @ignore
+   */
+  _loadDataFromPath(filepath, maxDepth, currentDepth) {
+    return fs.readFile(filepath, 'utf-8').then((contents) => {
+      let nextStep;
+      const extendTag = this._getExtendTag(contents);
+      if (extendTag) {
+        nextStep = this._parse(contents, filepath, maxDepth, currentDepth, extendTag);
+      } else {
+        nextStep = this._parseFileData(contents, filepath);
+      }
+
+      return nextStep;
+    });
   }
   /**
    * The method that actually does the parsing. The reason this is not in
@@ -179,59 +337,6 @@ class SFCParser {
     }
 
     return result;
-  }
-  /**
-   * Creates an instance of {@link SFCData} with the parsed results of an SFC.
-   *
-   * @param {string}           filepath       The path of the SFC.
-   * @param {SFCParserResults} parsedResults  The information obtained from parsing the
-   *                                          SFC.
-   * @returns {SFCData}
-   * @access protected
-   * @ignore
-   */
-  _createDataObject(filepath, parsedResults) {
-    const data = this._sfcData.new(filepath);
-    data.addMarkup(parsedResults.markup);
-    parsedResults.script.forEach((script) => {
-      const { tag, content } = script;
-      data.addScript(content, tag.attributes);
-    });
-
-    parsedResults.style.forEach((style) => {
-      const { tag, content } = style;
-      data.addStyle(content, tag.attributes);
-    });
-
-    return data;
-  }
-  /**
-   * Loads a SFC and checks if it implements an `<extend />` tag; if it does, it calls
-   * {@link SFCParser#_parse} to parse its "base SFC" first; otherwise, it parses its
-   * contents directly.
-   *
-   * @param {string} filepath      The path of the file.
-   * @param {number} maxDepth      How many components can be extended. For example, if a
-   *                               file extends from one that extends from another and the
-   *                               parameter is set to `1`, the parsing will fail.
-   * @param {number} currentDepth  The level of depth in which a file is currently being
-   *                               extended.
-   * @returns {Promise<SFCData | SFCParserResults, Error>}
-   * @access protected
-   * @ignore
-   */
-  _loadDataFromPath(filepath, maxDepth, currentDepth) {
-    return fs.readFile(filepath, 'utf-8').then((contents) => {
-      let nextStep;
-      const extendTag = this._getExtendTag(contents);
-      if (extendTag) {
-        nextStep = this._parse(contents, filepath, maxDepth, currentDepth, extendTag);
-      } else {
-        nextStep = this._parseFileData(contents, filepath);
-      }
-
-      return nextStep;
-    });
   }
   /**
    * Parses a SFC code and extract the information about its scripts, styling and markup.
@@ -345,111 +450,6 @@ class SFCParser {
 
     // Remove empty lines from the markup and transform it into text.
     result.markup = markupLines.filter((line) => !!line.trim()).join('\n');
-
-    return result;
-  }
-  /**
-   * Finds a relevant tag for the parser on a line of code.
-   *
-   * @param {string} line        The line to parse.
-   * @param {number} lineNumber  The number of the line, on the SFC.
-   * @param {string} filepath    The path of the SFC.
-   * @returns {?SFCParserResultTag}
-   * @throws {Error} If it finds two relevant tags (style/script) on the same line.
-   * @access protected
-   * @ignore
-   */
-  _getRelevantTag(line, lineNumber, filepath) {
-    let result;
-    const match = this._expressions.relevantTags.exec(line);
-    if (match) {
-      const [statement, slash, tagName, rawAttributes] = match;
-      const name = tagName.trim();
-      const closing = typeof slash !== 'undefined';
-      const attributes = this._getTagAttributes(rawAttributes);
-      result = {
-        statement,
-        name,
-        closing,
-        attributes,
-      };
-
-      if (this._expressions.relevantTags.exec(line)) {
-        const errorMessage = [
-          'The parser cant handle multiple script/style tags on the same line (sorry!)',
-          `- file: ${filepath}`,
-          `- line: ${lineNumber}`,
-          `- code: ${line}`,
-        ].join('\n');
-        throw new Error(errorMessage);
-      }
-    } else {
-      result = null;
-    }
-
-    return result;
-  }
-  /**
-   * Finds and parses the information of an `<extend />` tag on a SFC.
-   *
-   * @param {string} contents  The contents of the SFC.
-   * @returns {?SFCParserExtendTag}
-   * @access protected
-   * @ignore
-   */
-  _getExtendTag(contents) {
-    let result;
-    const match = this._expressions.extendTag.exec(contents);
-    if (match) {
-      const [statement, rawAttributes] = match;
-      const attributes = this._getTagAttributes(rawAttributes);
-      result = {
-        statement,
-        attributes,
-      };
-    } else {
-      result = null;
-    }
-
-    return result;
-  }
-  /**
-   * Parses a string of HTML tag attributes into an object.
-   * If an attribute doesn't have a value, its value will be `true` (boolean, no string);
-   * and if a value is a string for a boolean (`'true'` or `'false'`), it will become a
-   * real boolean.
-   *
-   * @param {string} rawAttributes  The attributes to parse.
-   * @returns {Object}
-   * @access protected
-   * @example
-   *
-   *   console.log(parser._getTagAttributes('from="file" html'));
-   *   // { from: 'file', html: true }
-   *   console.log(parser._getTagAttributes('from="file" html="false"'));
-   *   // { from: 'file', html: false }
-   *
-   * @ignore
-   */
-  _getTagAttributes(rawAttributes) {
-    const result = {};
-    let match = this._expressions.attributes.exec(rawAttributes);
-    while (match) {
-      let [, name, value] = match;
-      name = name.trim();
-      if (value) {
-        value = value.trim();
-        if (value.match(this._expressions.boolean)) {
-          value = value.toLowerCase() === 'true';
-        }
-      } else {
-        value = true;
-      }
-
-      result[name] = value;
-
-      match = this._expressions.attributes.exec(rawAttributes);
-    }
 
     return result;
   }

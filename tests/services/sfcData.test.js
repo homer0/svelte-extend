@@ -1,3 +1,4 @@
+// eslint-disable-next-line global-require
 jest.mock('jimple', () => require('../mocks/jimple.mock'));
 jest.unmock('../../src/services/sfcData');
 
@@ -193,7 +194,7 @@ describe('SFCData', () => {
     // Then
     expect(result).toEqual({
       content: [contentOne, contentTwo, contentThree].join('\n'),
-      attributes: Object.assign({}, attributesTwo, attributesThree),
+      attributes: { ...attributesTwo, ...attributesThree },
     });
   });
 
