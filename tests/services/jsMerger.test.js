@@ -1,18 +1,16 @@
-const JimpleMock = require('/tests/mocks/jimple.mock');
-
-jest.mock('jimple', () => JimpleMock);
+// eslint-disable-next-line global-require
+jest.mock('jimple', () => require('../mocks/jimple.mock'));
 jest.mock('babylon');
 jest.mock('@babel/traverse');
 jest.mock('@babel/types');
 jest.mock('@babel/generator');
-jest.unmock('/src/services/jsMerger');
+jest.unmock('../../src/services/jsMerger');
 
-require('jasmine-expect');
 const babylon = require('babylon');
 const babelTraverse = require('@babel/traverse').default;
 const babelTypes = require('@babel/types');
 const babelGenerator = require('@babel/generator').default;
-const { JSMerger, jsMerger } = require('/src/services/jsMerger');
+const { JSMerger, jsMerger } = require('../../src/services/jsMerger');
 
 describe('JSMerger', () => {
   beforeEach(() => {
@@ -82,10 +80,7 @@ describe('JSMerger', () => {
       node: 'base-text-node',
       insertBefore: jest.fn((node) => node),
     };
-    const baseNodes = [
-      baseImportNode,
-      baseTextNode,
-    ];
+    const baseNodes = [baseImportNode, baseTextNode];
     babelTypes.isProgram.mockImplementationOnce(() => true);
     babelTypes.isProgram.mockImplementationOnce(() => true);
     babelTypes.isImportDeclaration.mockImplementationOnce(() => true);
@@ -105,9 +100,7 @@ describe('JSMerger', () => {
       remove: jest.fn(),
       insertBefore: jest.fn((node) => node),
     };
-    const extendedNodes = [
-      extendedImportNode,
-    ];
+    const extendedNodes = [extendedImportNode];
     babelTypes.isProgram.mockImplementationOnce(() => true);
     babelTypes.isImportDeclaration.mockImplementationOnce(() => true);
     babylon.parse.mockImplementationOnce(() => extendedAST);
@@ -144,11 +137,13 @@ describe('JSMerger', () => {
     const baseBindingParentPath = {
       node: {
         declaration: {
-          declarations: [{
-            id: {
-              name: baseBindingName,
+          declarations: [
+            {
+              id: {
+                name: baseBindingName,
+              },
             },
-          }],
+          ],
         },
       },
     };
@@ -160,11 +155,13 @@ describe('JSMerger', () => {
     const baseBindingToOverwriteParentPath = {
       node: {
         declaration: {
-          declarations: [{
-            id: {
-              name: baseBindingToOverwriteName,
+          declarations: [
+            {
+              id: {
+                name: baseBindingToOverwriteName,
+              },
             },
-          }],
+          ],
         },
       },
       remove: jest.fn(),
@@ -174,10 +171,7 @@ describe('JSMerger', () => {
       parent: 'base-binding-to-overwrite-node-parent',
       parentPath: baseBindingToOverwriteParentPath,
     };
-    const baseNodes = [
-      baseBinding,
-      baseBindingToOverwrite,
-    ];
+    const baseNodes = [baseBinding, baseBindingToOverwrite];
     babelTypes.isVariableDeclaration.mockImplementationOnce(() => true);
     babelTypes.isVariableDeclaration.mockImplementationOnce(() => true);
     babelTypes.isExportNamedDeclaration.mockImplementationOnce(() => true);
@@ -195,11 +189,13 @@ describe('JSMerger', () => {
     const extendedBindingParentPath = {
       node: {
         declaration: {
-          declarations: [{
-            id: {
-              name: extendedBindingName,
+          declarations: [
+            {
+              id: {
+                name: extendedBindingName,
+              },
             },
-          }],
+          ],
         },
       },
     };
@@ -210,11 +206,13 @@ describe('JSMerger', () => {
     const extendedBindingThatOverwritesParentPath = {
       node: {
         declaration: {
-          declarations: [{
-            id: {
-              name: baseBindingToOverwriteName,
+          declarations: [
+            {
+              id: {
+                name: baseBindingToOverwriteName,
+              },
             },
-          }],
+          ],
         },
       },
       remove: jest.fn(),
@@ -223,10 +221,7 @@ describe('JSMerger', () => {
       parent: 'extended-binding-that-overwrites-node-parent',
       parentPath: extendedBindingThatOverwritesParentPath,
     };
-    const extendedNodes = [
-      extendedBinding,
-      extendedBindingThatOverwrites,
-    ];
+    const extendedNodes = [extendedBinding, extendedBindingThatOverwrites];
     babelTypes.isVariableDeclaration.mockImplementationOnce(() => true);
     babelTypes.isVariableDeclaration.mockImplementationOnce(() => true);
     babelTypes.isExportNamedDeclaration.mockImplementationOnce(() => true);
@@ -256,7 +251,7 @@ describe('JSMerger', () => {
     expect(extendedBindingThatOverwritesParentPath.remove).toHaveBeenCalledTimes(1);
     expect(baseBindingToOverwriteParentPath.insertAfter).toHaveBeenCalledTimes(1);
     expect(baseBindingToOverwriteParentPath.insertAfter).toHaveBeenCalledWith(
-      extendedBindingThatOverwritesParentPath.node
+      extendedBindingThatOverwritesParentPath.node,
     );
     expect(baseBindingToOverwriteParentPath.remove).toHaveBeenCalledTimes(1);
   });
@@ -269,22 +264,26 @@ describe('JSMerger', () => {
     const baseVar = {
       parent: 'base-var-node-parent',
       node: {
-        declarations: [{
-          id: {
-            name: baseVarName,
+        declarations: [
+          {
+            id: {
+              name: baseVarName,
+            },
           },
-        }],
+        ],
       },
     };
     const baseVarToOverwriteName = 'base-var-to-overwrite';
     const baseVarToOverwrite = {
       parent: 'base-var-to-overwrite-node-parent',
       node: {
-        declarations: [{
-          id: {
-            name: baseVarToOverwriteName,
+        declarations: [
+          {
+            id: {
+              name: baseVarToOverwriteName,
+            },
           },
-        }],
+        ],
       },
       remove: jest.fn(),
       insertAfter: jest.fn(),
@@ -292,11 +291,7 @@ describe('JSMerger', () => {
     const baseVarToIgnore = {
       parent: 'base-var-to-ignore-node-parent',
     };
-    const baseNodes = [
-      baseVar,
-      baseVarToOverwrite,
-      baseVarToIgnore,
-    ];
+    const baseNodes = [baseVar, baseVarToOverwrite, baseVarToIgnore];
     babelTypes.isProgram.mockImplementationOnce(() => true);
     babelTypes.isProgram.mockImplementationOnce(() => true);
     babelTypes.isProgram.mockImplementationOnce(() => false);
@@ -316,28 +311,29 @@ describe('JSMerger', () => {
     const extendedVar = {
       parent: 'extended-var-node-parent',
       node: {
-        declarations: [{
-          id: {
-            name: extendedVarName,
+        declarations: [
+          {
+            id: {
+              name: extendedVarName,
+            },
           },
-        }],
+        ],
       },
     };
     const extendedVarThatOverwrites = {
       parent: 'extended-var-that-overwrites-node-parent',
       node: {
-        declarations: [{
-          id: {
-            name: baseVarToOverwriteName,
+        declarations: [
+          {
+            id: {
+              name: baseVarToOverwriteName,
+            },
           },
-        }],
+        ],
       },
       remove: jest.fn(),
     };
-    const extendedNodes = [
-      extendedVar,
-      extendedVarThatOverwrites,
-    ];
+    const extendedNodes = [extendedVar, extendedVarThatOverwrites];
     babelTypes.isProgram.mockImplementationOnce(() => true);
     babelTypes.isProgram.mockImplementationOnce(() => true);
     babelTypes.isVariableDeclaration.mockImplementationOnce(() => true);
@@ -364,11 +360,13 @@ describe('JSMerger', () => {
       expect(babelTypes.isVariableDeclaration).toHaveBeenCalledWith(node);
     });
     expect(babelTypes.isExportNamedDeclaration).toHaveBeenCalledTimes(1);
-    expect(babelTypes.isExportNamedDeclaration).toHaveBeenCalledWith(baseVarToIgnore.parent);
+    expect(babelTypes.isExportNamedDeclaration).toHaveBeenCalledWith(
+      baseVarToIgnore.parent,
+    );
     expect(extendedVarThatOverwrites.remove).toHaveBeenCalledTimes(1);
     expect(baseVarToOverwrite.insertAfter).toHaveBeenCalledTimes(1);
     expect(baseVarToOverwrite.insertAfter).toHaveBeenCalledWith(
-      extendedVarThatOverwrites.node
+      extendedVarThatOverwrites.node,
     );
     expect(baseVarToOverwrite.remove).toHaveBeenCalledTimes(1);
   });
@@ -400,11 +398,7 @@ describe('JSMerger', () => {
     const baseFuncToIgnore = {
       parent: 'base-func-to-ignore-node-parent',
     };
-    const baseNodes = [
-      baseFunc,
-      baseFuncToOverwrite,
-      baseFuncToIgnore,
-    ];
+    const baseNodes = [baseFunc, baseFuncToOverwrite, baseFuncToIgnore];
     babelTypes.isProgram.mockImplementationOnce(() => true);
     babelTypes.isProgram.mockImplementationOnce(() => true);
     babelTypes.isProgram.mockImplementationOnce(() => false);
@@ -438,10 +432,7 @@ describe('JSMerger', () => {
       },
       remove: jest.fn(),
     };
-    const extendedNodes = [
-      extendedFunc,
-      extendedFuncThatOverwrites,
-    ];
+    const extendedNodes = [extendedFunc, extendedFuncThatOverwrites];
     babelTypes.isProgram.mockImplementationOnce(() => true);
     babelTypes.isProgram.mockImplementationOnce(() => true);
     babelTypes.isFunctionDeclaration.mockImplementationOnce(() => true);
@@ -470,7 +461,7 @@ describe('JSMerger', () => {
     expect(extendedFuncThatOverwrites.remove).toHaveBeenCalledTimes(1);
     expect(baseFuncToOverwrite.insertAfter).toHaveBeenCalledTimes(1);
     expect(baseFuncToOverwrite.insertAfter).toHaveBeenCalledWith(
-      extendedFuncThatOverwrites.node
+      extendedFuncThatOverwrites.node,
     );
     expect(baseFuncToOverwrite.remove).toHaveBeenCalledTimes(1);
   });

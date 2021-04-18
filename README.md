@@ -1,7 +1,7 @@
 # svelte-extend
 
-[![Travis](https://img.shields.io/travis/homer0/svelte-extend.svg?style=flat-square)](https://travis-ci.org/homer0/svelte-extend)
-[![Coveralls github](https://img.shields.io/coveralls/github/homer0/svelte-extend.svg?style=flat-square)](https://coveralls.io/github/homer0/svelte-extend?branch=master)
+[![GitHub Workflow Status (main)](https://img.shields.io/github/workflow/status/homer0/svelte-extend/Test/main?style=flat-square)](https://github.com/homer0/svelte-extend/actions?query=workflow%3ATest)
+[![Coveralls github](https://img.shields.io/coveralls/github/homer0/svelte-extend.svg?style=flat-square)](https://coveralls.io/github/homer0/svelte-extend?branch=main)
 [![David](https://img.shields.io/david/homer0/svelte-extend.svg?style=flat-square)](https://david-dm.org/homer0/svelte-extend)
 [![David](https://img.shields.io/david/dev/homer0/svelte-extend.svg?style=flat-square)](https://david-dm.org/homer0/svelte-extend)
 
@@ -10,7 +10,7 @@ Create new Svelte components by extending existing ones
 ## Introduction
 
 > **Disclaimer:** I'm aware that this doesn't existed for a reason, and while I consider the opinion of the author of Svelte to be valid, I needed this for a very specific case. If you are interested on using this library, I would recommend you to **think hard if you really need it**.
-> 
+>
 > Extending single file components is not the same as OOP inheritance, there's a lot of things that end up hidden (because there's no `class`) and your IDE (unless someone integrates this on an IDE :P) won't be able to warn you about.
 
 This library introduces an `extend` HTML tag that you'll be able to use on your `.svelte` files in order to indicate that the component you are creating extends from another one:
@@ -189,19 +189,43 @@ module.exports = {
 
 ### Repository hooks
 
-I use [husky](https://yarnpkg.com/en/package/husky) to automatically install the repository hooks so the code will be tested and linted before any commit, and the dependencies updated after every merge. The configuration is on the `husky` property of the `package.json` and the hooks' files are on `./utils/hooks`.
+I use [`husky`](https://yarnpkg.com/package/husky) to automatically install the repository hooks so...
+
+1. The code will be formatted and linted before any commit.
+2. The dependencies will be updated after every merge.
+3. The tests will run before pushing.
+
+#### Commits convention
+
+I use [conventional commits](https://www.conventionalcommits.org) with [`commitlint`](https://commitlint.js.org) in order to support semantic releases. The one that sets it up is actually husky, that installs a script that runs `commitlint` on the `git commit` command.
+
+The configuration is on the `commitlint` property of the `package.json`.
+
+### Releases
+
+I use [`semantic-release`](https://yarnpkg.com/package/semantic-release) and a GitHub action to automatically release on NPM everything that gets merged to main.
+
+The configuration for `semantic-release` is on `./releaserc` and the workflow for the release is on `./.github/workflow/release.yml`.
 
 ### Testing
 
-I use [Jest](https://facebook.github.io/jest/) with [Jest-Ex](https://yarnpkg.com/en/package/jest-ex) to test the project. The configuration file is on `./.jestrc.json`, the tests are on `./tests` and the script that runs it is on `./utils/scripts/test`.
+I use [Jest](https://facebook.github.io/jest/) to test the project.
 
-### Linting
+The configuration file is on `./.jestrc.js`, the tests are on `./tests` and the script that runs it is on `./utils/scripts/test`.
 
-I use [ESlint](http://eslint.org) with [my own custom configuration](http://yarnpkg.com/en/package/eslint-plugin-homer0) to validate all the JS code. The configuration file for the project code is on `./.eslintrc` and the one for the tests is on `./tests/.eslintrc`. There's also an `./.eslintignore` to exclude some files on the process. The script that runs it is on `./utils/scripts/lint`.
+### Code linting and formatting
+
+For linting, I use [ESlint](https://eslint.org) with [my own custom configuration](https://yarnpkg.com/package/@homer0/eslint-plugin); there are two configuration files, `./.eslintrc` for the source and the tooling, and `./tests/.eslintrc`, and there's also a `./.eslintignore` to exclude some files.
+
+And for formatting, I use [Prettier](https://prettier.io) with [my JSDoc plugin](https://yarnpkg.com/package/@homer0/prettier-plugin-jsdoc) and [my own custom configuration](https://yarnpkg.com/package/@homer0/prettier-config). The configuration file is `./.prettierrc`.
+
+The script that runs them is `./utils/scripts/lint`; the script `lint-all` only runs ESLint, and runs it for the entire project.
 
 ### Documentation
 
-I use [ESDoc](http://esdoc.org) to generate HTML documentation for the project. The configuration file is on `./.esdoc.json` and the script that runs it is on `./utils/scripts/docs`.
+I use [JSDoc](https://jsdoc.app) to generate an HTML documentation site for the project.
+
+The configuration file is on `./.jsdoc.js` and the script that runs it is on `./utils/scripts/docs`.
 
 ### To-Dos
 

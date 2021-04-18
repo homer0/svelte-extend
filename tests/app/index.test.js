@@ -1,5 +1,3 @@
-const JimpleMock = require('/tests/mocks/jimple.mock');
-
 const wootilsServices = {
   appLogger: 'wootils-appLogger',
 };
@@ -10,15 +8,15 @@ const appServices = {
   sfcParser: 'app-sfcParser',
 };
 jest.mock('fs-extra');
-jest.mock('jimple', () => JimpleMock);
+// eslint-disable-next-line global-require
+jest.mock('jimple', () => require('../mocks/jimple.mock'));
 jest.mock('wootils/node/logger', () => wootilsServices);
-jest.mock('/src/services', () => appServices);
-jest.unmock('/src/app/index');
-
-require('jasmine-expect');
+jest.mock('../../src/services', () => appServices);
+jest.unmock('../../src/app/index');
 
 const fs = require('fs-extra');
-const SvelteExtend = require('/src/app');
+const JimpleMock = require('../mocks/jimple.mock');
+const SvelteExtend = require('../../src/app');
 
 describe('SvelteExtend', () => {
   beforeEach(() => {
@@ -66,19 +64,14 @@ describe('SvelteExtend', () => {
     let sut = null;
     // When
     sut = new SvelteExtend();
-    return sut.extend(contents, filepath)
-    .then((result) => {
+    return sut.extend(contents, filepath).then((result) => {
       // Then
       expect(result).toBe(final);
       expect(sut.get).toHaveBeenCalledTimes(2);
       expect(sut.get).toHaveBeenCalledWith('sfcParser');
       expect(sut.get).toHaveBeenCalledWith('extender');
       expect(sfcParser.parse).toHaveBeenCalledTimes(1);
-      expect(sfcParser.parse).toHaveBeenCalledWith(
-        contents,
-        filepath,
-        0
-      );
+      expect(sfcParser.parse).toHaveBeenCalledWith(contents, filepath, 0);
       expect(extender.generate).toHaveBeenCalledTimes(1);
       expect(extender.generate).toHaveBeenCalledWith(parsed);
       expect(extended.render).toHaveBeenCalledTimes(1);
@@ -106,26 +99,21 @@ describe('SvelteExtend', () => {
     let sut = null;
     // When
     sut = new SvelteExtend();
-    return sut.extend(contents, filepath, maxDepth)
-    .then((result) => {
+    return sut.extend(contents, filepath, maxDepth).then((result) => {
       // Then
       expect(result).toBe(final);
       expect(sut.get).toHaveBeenCalledTimes(2);
       expect(sut.get).toHaveBeenCalledWith('sfcParser');
       expect(sut.get).toHaveBeenCalledWith('extender');
       expect(sfcParser.parse).toHaveBeenCalledTimes(1);
-      expect(sfcParser.parse).toHaveBeenCalledWith(
-        contents,
-        filepath,
-        maxDepth
-      );
+      expect(sfcParser.parse).toHaveBeenCalledWith(contents, filepath, maxDepth);
       expect(extender.generate).toHaveBeenCalledTimes(1);
       expect(extender.generate).toHaveBeenCalledWith(parsed);
       expect(extended.render).toHaveBeenCalledTimes(1);
     });
   });
 
-  it('shouldn\'t extend a component because that can\'t be parsed', () => {
+  it("shouldn't extend a component because that can't be parsed", () => {
     // Given
     const sfcParser = {
       parse: jest.fn(() => Promise.resolve(null)),
@@ -140,18 +128,13 @@ describe('SvelteExtend', () => {
     let sut = null;
     // When
     sut = new SvelteExtend();
-    return sut.extend(contents, filepath)
-    .then((result) => {
+    return sut.extend(contents, filepath).then((result) => {
       // Then
       expect(result).toBe(contents);
       expect(sut.get).toHaveBeenCalledTimes(1);
       expect(sut.get).toHaveBeenCalledWith('sfcParser');
       expect(sfcParser.parse).toHaveBeenCalledTimes(1);
-      expect(sfcParser.parse).toHaveBeenCalledWith(
-        contents,
-        filepath,
-        0
-      );
+      expect(sfcParser.parse).toHaveBeenCalledWith(contents, filepath, 0);
       expect(extender.generate).toHaveBeenCalledTimes(0);
     });
   });
@@ -177,8 +160,7 @@ describe('SvelteExtend', () => {
     let sut = null;
     // When
     sut = new SvelteExtend();
-    return sut.extendFromPath(filepath)
-    .then((result) => {
+    return sut.extendFromPath(filepath).then((result) => {
       // Then
       expect(result).toBe(final);
       expect(fs.readFile).toHaveBeenCalledTimes(1);
@@ -187,11 +169,7 @@ describe('SvelteExtend', () => {
       expect(sut.get).toHaveBeenCalledWith('sfcParser');
       expect(sut.get).toHaveBeenCalledWith('extender');
       expect(sfcParser.parse).toHaveBeenCalledTimes(1);
-      expect(sfcParser.parse).toHaveBeenCalledWith(
-        contents,
-        filepath,
-        0
-      );
+      expect(sfcParser.parse).toHaveBeenCalledWith(contents, filepath, 0);
       expect(extender.generate).toHaveBeenCalledTimes(1);
       expect(extender.generate).toHaveBeenCalledWith(parsed);
       expect(extended.render).toHaveBeenCalledTimes(1);
@@ -220,8 +198,7 @@ describe('SvelteExtend', () => {
     let sut = null;
     // When
     sut = new SvelteExtend();
-    return sut.extendFromPath(filepath, maxDepth)
-    .then((result) => {
+    return sut.extendFromPath(filepath, maxDepth).then((result) => {
       // Then
       expect(result).toBe(final);
       expect(fs.readFile).toHaveBeenCalledTimes(1);
@@ -230,11 +207,7 @@ describe('SvelteExtend', () => {
       expect(sut.get).toHaveBeenCalledWith('sfcParser');
       expect(sut.get).toHaveBeenCalledWith('extender');
       expect(sfcParser.parse).toHaveBeenCalledTimes(1);
-      expect(sfcParser.parse).toHaveBeenCalledWith(
-        contents,
-        filepath,
-        maxDepth
-      );
+      expect(sfcParser.parse).toHaveBeenCalledWith(contents, filepath, maxDepth);
       expect(extender.generate).toHaveBeenCalledTimes(1);
       expect(extender.generate).toHaveBeenCalledWith(parsed);
       expect(extended.render).toHaveBeenCalledTimes(1);

@@ -10,9 +10,7 @@ const mocks = {
 
     const result = services[name];
 
-    return servicesAsFunctions[name] ?
-      result() :
-      result;
+    return servicesAsFunctions[name] ? result() : result;
   }),
   register: jest.fn(),
   factory: jest.fn((fn) => fn()),
@@ -23,9 +21,8 @@ class JimpleMock {
     mocks[name] = mock;
   }
 
-  static service(name, mock, asFunction = false) {
-    services[name] = mock;
-    servicesAsFunctions[name] = asFunction;
+  static provider(register) {
+    return register;
   }
 
   static reset() {
@@ -39,8 +36,9 @@ class JimpleMock {
     });
   }
 
-  static provider(register) {
-    return register;
+  static service(name, mock, asFunction = false) {
+    services[name] = mock;
+    servicesAsFunctions[name] = asFunction;
   }
 
   constructor() {

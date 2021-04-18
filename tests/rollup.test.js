@@ -1,11 +1,10 @@
 jest.mock('@rollup/pluginutils');
-jest.unmock('/src/rollup');
+jest.unmock('../src/rollup');
 
 const rollupUtils = require('@rollup/pluginutils');
-require('jasmine-expect');
-const app = require('/src/index');
+const app = require('../src/index');
 
-const SvelteExtendRollupPlugin = require('/src/rollup');
+const SvelteExtendRollupPlugin = require('../src/rollup');
 
 describe('integrations:Rollup', () => {
   beforeEach(() => {
@@ -26,7 +25,7 @@ describe('integrations:Rollup', () => {
       exclude: [],
     });
     expect(sut.name).toBe('svelte-extend-rollup-plugin');
-    expect(sut.transform).toBeFunction();
+    expect(typeof sut.transform).toBe('function');
     expect(rollupUtils.createFilter).toHaveBeenCalledTimes(1);
     expect(rollupUtils.createFilter).toHaveBeenCalledWith([], []);
   });
@@ -46,11 +45,11 @@ describe('integrations:Rollup', () => {
     expect(sut).toBeInstanceOf(SvelteExtendRollupPlugin);
     expect(sut.options).toEqual(options);
     expect(sut.name).toBe(name);
-    expect(sut.transform).toBeFunction();
+    expect(typeof sut.transform).toBe('function');
     expect(rollupUtils.createFilter).toHaveBeenCalledTimes(1);
     expect(rollupUtils.createFilter).toHaveBeenCalledWith(
       options.include,
-      options.exclude
+      options.exclude,
     );
   });
 
@@ -67,7 +66,7 @@ describe('integrations:Rollup', () => {
       exclude: [],
     });
     expect(sut.name).toBe('svelte-extend-rollup-plugin');
-    expect(sut.transform).toBeFunction();
+    expect(typeof sut.transform).toBe('function');
     expect(rollupUtils.createFilter).toHaveBeenCalledTimes(1);
     expect(rollupUtils.createFilter).toHaveBeenCalledWith([], []);
   });
@@ -115,7 +114,7 @@ describe('integrations:Rollup', () => {
     expect(app.extend).toHaveBeenCalledWith(code, filepath, allowedMaxDepth);
   });
 
-  it('should ignore a file because it doesn\'t have a .svelte extension', () => {
+  it("should ignore a file because it doesn't have a .svelte extension", () => {
     // Given
     const filter = jest.fn();
     rollupUtils.createFilter.mockImplementationOnce(() => filter);
@@ -132,7 +131,7 @@ describe('integrations:Rollup', () => {
     expect(app.extend).toHaveBeenCalledTimes(0);
   });
 
-  it('should ignore a file because it doesn\'t match the filter', () => {
+  it("should ignore a file because it doesn't match the filter", () => {
     // Given
     const filter = jest.fn(() => false);
     rollupUtils.createFilter.mockImplementationOnce(() => filter);

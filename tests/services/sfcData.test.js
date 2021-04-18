@@ -1,11 +1,9 @@
+// eslint-disable-next-line global-require
+jest.mock('jimple', () => require('../mocks/jimple.mock'));
+jest.unmock('../../src/services/sfcData');
+
 const path = require('path');
-const JimpleMock = require('/tests/mocks/jimple.mock');
-
-jest.mock('jimple', () => JimpleMock);
-jest.unmock('/src/services/sfcData');
-
-require('jasmine-expect');
-const { SFCData, sfcData } = require('/src/services/sfcData');
+const { SFCData, sfcData } = require('../../src/services/sfcData');
 
 describe('SFCData', () => {
   it('should be instantiated with a filepath and generate a directory path', () => {
@@ -19,10 +17,10 @@ describe('SFCData', () => {
     expect(sut).toBeInstanceOf(SFCData);
     expect(sut.filepath).toBe(filepath);
     expect(sut.directory).toBe(directoryPath);
-    expect(sut.hasBaseFileData).toBeFalse();
-    expect(sut.hasStyles).toBeFalse();
-    expect(sut.hasScripts).toBeFalse();
-    expect(sut.hasModuleScripts).toBeFalse();
+    expect(sut.hasBaseFileData).toBe(false);
+    expect(sut.hasStyles).toBe(false);
+    expect(sut.hasScripts).toBe(false);
+    expect(sut.hasModuleScripts).toBe(false);
   });
 
   it('should be instantiated with the shorthand static method', () => {
@@ -36,21 +34,21 @@ describe('SFCData', () => {
     expect(sut).toBeInstanceOf(SFCData);
     expect(sut.filepath).toBe(filepath);
     expect(sut.directory).toBe(directoryPath);
-    expect(sut.hasBaseFileData).toBeFalse();
+    expect(sut.hasBaseFileData).toBe(false);
     expect(sut.baseFileData).toBeNull();
-    expect(sut.hasStyles).toBeFalse();
+    expect(sut.hasStyles).toBe(false);
     expect(sut.styles).toEqual([]);
     expect(sut.style).toEqual({
       content: '',
       attributes: {},
     });
-    expect(sut.hasScripts).toBeFalse();
+    expect(sut.hasScripts).toBe(false);
     expect(sut.scripts).toEqual([]);
     expect(sut.script).toEqual({
       content: '',
       attributes: {},
     });
-    expect(sut.hasModuleScripts).toBeFalse();
+    expect(sut.hasModuleScripts).toBe(false);
     expect(sut.moduleScripts).toEqual([]);
     expect(sut.moduleScript).toEqual({
       content: '',
@@ -69,7 +67,7 @@ describe('SFCData', () => {
     sut = SFCData.new('some/other/file/path.svelte');
     sut.addBaseFileData(base);
     // Then
-    expect(sut.hasBaseFileData).toBeTrue();
+    expect(sut.hasBaseFileData).toBe(true);
     expect(sut.baseFileData).toBe(base);
   });
 
@@ -85,7 +83,7 @@ describe('SFCData', () => {
     sut = SFCData.new('some/other/file/path.svelte');
     sut.addBaseFileData(base, extendTagAttributes);
     // Then
-    expect(sut.hasBaseFileData).toBeTrue();
+    expect(sut.hasBaseFileData).toBe(true);
     expect(sut.baseFileData).toBe(base);
     expect(sut.extendTagAttributes).toBe(extendTagAttributes);
   });
@@ -96,8 +94,9 @@ describe('SFCData', () => {
     // When/Then
     sut = SFCData.new('some/other/file/path.svelte');
     sut.addBaseFileData(SFCData.new('some/file/path.svelte'));
-    expect(() => sut.addBaseFileData(SFCData.new('some/file/path.svelte')))
-    .toThrow(/You can't add more than one base file data/i);
+    expect(() => sut.addBaseFileData(SFCData.new('some/file/path.svelte'))).toThrow(
+      /You can't add more than one base file data/i,
+    );
   });
 
   it('should throw an error when trying to add data from an invalid object', () => {
@@ -140,7 +139,7 @@ describe('SFCData', () => {
     sut = SFCData.new('some/other/file/path.svelte');
     sut.addScript(content);
     // Then
-    expect(sut.hasScripts).toBeTrue();
+    expect(sut.hasScripts).toBe(true);
     expect(sut.scripts).toEqual([
       {
         content,
@@ -164,7 +163,7 @@ describe('SFCData', () => {
     sut = SFCData.new('some/other/file/path.svelte');
     sut.addScript(content, attributes);
     // Then
-    expect(sut.hasScripts).toBeTrue();
+    expect(sut.hasScripts).toBe(true);
     expect(sut.scripts).toEqual([
       {
         content,
@@ -195,7 +194,7 @@ describe('SFCData', () => {
     // Then
     expect(result).toEqual({
       content: [contentOne, contentTwo, contentThree].join('\n'),
-      attributes: Object.assign({}, attributesTwo, attributesThree),
+      attributes: { ...attributesTwo, ...attributesThree },
     });
   });
 
@@ -210,8 +209,8 @@ describe('SFCData', () => {
     sut = SFCData.new('some/other/file/path.svelte');
     sut.addScript(content, attributes);
     // Then
-    expect(sut.hasScripts).toBeFalse();
-    expect(sut.hasModuleScripts).toBeTrue();
+    expect(sut.hasScripts).toBe(false);
+    expect(sut.hasModuleScripts).toBe(true);
     expect(sut.moduleScripts).toEqual([
       {
         content,
@@ -232,7 +231,7 @@ describe('SFCData', () => {
     sut = SFCData.new('some/other/file/path.svelte');
     sut.addStyle(content);
     // Then
-    expect(sut.hasStyles).toBeTrue();
+    expect(sut.hasStyles).toBe(true);
     expect(sut.styles).toEqual([
       {
         content,
@@ -256,7 +255,7 @@ describe('SFCData', () => {
     sut = SFCData.new('some/other/file/path.svelte');
     sut.addStyle(content, attributes);
     // Then
-    expect(sut.hasStyles).toBeTrue();
+    expect(sut.hasStyles).toBe(true);
     expect(sut.styles).toEqual([
       {
         content,
@@ -343,12 +342,7 @@ describe('SFCData', () => {
     const markup = '<marquee>woooo</marquee>';
     let sut = null;
     let result = null;
-    const expectedResult = [
-      '<style>',
-      styleData.content,
-      '</style>',
-      markup,
-    ].join('\n');
+    const expectedResult = ['<style>', styleData.content, '</style>', markup].join('\n');
     // When
     sut = SFCData.new('some/other/file/path.svelte');
     sut.addStyle(styleData.content);
