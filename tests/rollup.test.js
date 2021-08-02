@@ -15,11 +15,13 @@ describe('integrations:Rollup', () => {
   it('should be instantiated with its default options', () => {
     // Given
     let sut = null;
+    let sutOptions = null;
     // When
     sut = new SvelteExtendRollupPlugin();
+    sutOptions = sut.getOptions();
     // Then
     expect(sut).toBeInstanceOf(SvelteExtendRollupPlugin);
-    expect(sut.options).toEqual({
+    expect(sutOptions).toEqual({
       allowedMaxDepth: 0,
       include: [],
       exclude: [],
@@ -39,11 +41,13 @@ describe('integrations:Rollup', () => {
     };
     const name = 'my-extend-plugin';
     let sut = null;
+    let sutOptions = null;
     // When
     sut = new SvelteExtendRollupPlugin(options, name);
+    sutOptions = sut.getOptions();
     // Then
     expect(sut).toBeInstanceOf(SvelteExtendRollupPlugin);
-    expect(sut.options).toEqual(options);
+    expect(sutOptions).toEqual(options);
     expect(sut.name).toBe(name);
     expect(typeof sut.transform).toBe('function');
     expect(rollupUtils.createFilter).toHaveBeenCalledTimes(1);
@@ -56,11 +60,13 @@ describe('integrations:Rollup', () => {
   it('should be instantiated using the shorthand static method', () => {
     // Given
     let sut = null;
+    let sutOptions = null;
     // When
     sut = SvelteExtendRollupPlugin.svelteExtend();
+    sutOptions = sut.getOptions();
     // Then
     expect(sut).toBeInstanceOf(SvelteExtendRollupPlugin);
-    expect(sut.options).toEqual({
+    expect(sutOptions).toEqual({
       allowedMaxDepth: 0,
       include: [],
       exclude: [],
@@ -85,7 +91,10 @@ describe('integrations:Rollup', () => {
     sut = SvelteExtendRollupPlugin.svelteExtend();
     result = sut.transform(code, filepath);
     // Then
-    expect(result).toBe(transformed);
+    expect(result).toEqual({
+      code: transformed,
+      map: null,
+    });
     expect(filter).toHaveBeenCalledTimes(1);
     expect(filter).toHaveBeenCalledWith(filepath);
     expect(app.extend).toHaveBeenCalledTimes(1);
@@ -107,7 +116,10 @@ describe('integrations:Rollup', () => {
     sut = SvelteExtendRollupPlugin.svelteExtend({ allowedMaxDepth });
     result = sut.transform(code, filepath);
     // Then
-    expect(result).toBe(transformed);
+    expect(result).toEqual({
+      code: transformed,
+      map: null,
+    });
     expect(filter).toHaveBeenCalledTimes(1);
     expect(filter).toHaveBeenCalledWith(filepath);
     expect(app.extend).toHaveBeenCalledTimes(1);

@@ -158,14 +158,18 @@ module.exports = {
   ...
   plugins: [
     ...,
-    // The official one, to actually compile the `.svelte` files.
-    svelte({ ... }),
-    // The one for `svelte-extend`
+    /**
+     * The one for `svelte-extend`: it needs to go before the official one because
+     * it parses the template as `.svelte` files and not as the actual `.js` the
+     * Svelte compiler produces.
+     */
     svelteExtend({
       include: [], // Files to include.
       exclude: [], // Files to exclude.
       allowedMaxDepth: 0, // No limit.
     });
+    // The official one, to actually compile the `.svelte` files.
+    svelte({ ... }),
   ],
 };
 ```

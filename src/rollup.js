@@ -74,6 +74,18 @@ class SvelteExtendRollupPlugin {
      * @ignore
      */
     this._filter = rollupUtils.createFilter(this._options.include, this._options.exclude);
+    /**
+     * @ignore
+     */
+    this.transform = this.transform.bind(this);
+  }
+  /**
+   * Get the plugin current options.
+   *
+   * @type {SvelteExtendRollupPluginOptions}
+   */
+  getOptions() {
+    return this._options;
   }
   /**
    * The method Rollup calls when processing a file. It first validates if the file
@@ -87,7 +99,10 @@ class SvelteExtendRollupPlugin {
   transform(code, filepath) {
     let result;
     if (filepath.match(/\.svelte(?:$|\?)/i) && this._filter(filepath)) {
-      result = app.extend(code, filepath, this._options.allowedMaxDepth);
+      result = {
+        code: app.extend(code, filepath, this._options.allowedMaxDepth),
+        map: null,
+      };
     } else {
       result = null;
     }
@@ -101,14 +116,6 @@ class SvelteExtendRollupPlugin {
    */
   get name() {
     return this._name;
-  }
-  /**
-   * The plugin options.
-   *
-   * @type {SvelteExtendRollupPluginOptions}
-   */
-  get options() {
-    return this._options;
   }
 }
 
