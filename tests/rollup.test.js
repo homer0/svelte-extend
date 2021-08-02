@@ -91,7 +91,10 @@ describe('integrations:Rollup', () => {
     sut = SvelteExtendRollupPlugin.svelteExtend();
     result = sut.transform(code, filepath);
     // Then
-    expect(result).toBe(transformed);
+    expect(result).toEqual({
+      code: transformed,
+      map: null,
+    });
     expect(filter).toHaveBeenCalledTimes(1);
     expect(filter).toHaveBeenCalledWith(filepath);
     expect(app.extend).toHaveBeenCalledTimes(1);
@@ -113,7 +116,10 @@ describe('integrations:Rollup', () => {
     sut = SvelteExtendRollupPlugin.svelteExtend({ allowedMaxDepth });
     result = sut.transform(code, filepath);
     // Then
-    expect(result).toBe(transformed);
+    expect(result).toEqual({
+      code: transformed,
+      map: null,
+    });
     expect(filter).toHaveBeenCalledTimes(1);
     expect(filter).toHaveBeenCalledWith(filepath);
     expect(app.extend).toHaveBeenCalledTimes(1);
