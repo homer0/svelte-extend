@@ -32,7 +32,7 @@
     "@commitlint/config-conventional": "^13.1.0",
     "@homer0/eslint-plugin": "^8.0.0",
     "@homer0/prettier-config": "^1.1.1",
-    "@homer0/prettier-plugin-jsdoc": "^4.0.2",
+    "@homer0/prettier-plugin-jsdoc": "^4.0.3",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/git": "^9.0.0",
     "docdash": "homer0/docdash#semver:^2.1.0",

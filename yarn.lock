@@ -1093,12 +1093,12 @@
   resolved "https://registry.yarnpkg.com/@homer0/prettier-config/-/prettier-config-1.1.1.tgz#7b9559620f2a08954b42fea5de50ddf8dd647f9b"
   integrity sha512-Nyl4EVqK5a2BVgPrr0HmFgFwtI2lSy6qV+oe1Oiqow/N/8nlOaUKOVfkwCpaGYlt746DpPmwgQi4Yp/E/yvliQ==
 
-"@homer0/prettier-plugin-jsdoc@^4.0.2":
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@homer0/prettier-plugin-jsdoc/-/prettier-plugin-jsdoc-4.0.2.tgz#fe6247ea8275844c706f87b476e39e97c9474f5f"
-  integrity sha512-NvjwSET3pfAaUoPplZp96xriNdVoLDKo9P8P0uxZM+bftU2ueucJFTe/f4PEh/gT+K5waC4ThEcRPHhKBzzWdg==
+"@homer0/prettier-plugin-jsdoc@^4.0.3":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@homer0/prettier-plugin-jsdoc/-/prettier-plugin-jsdoc-4.0.3.tgz#1506e8b75105a9a90c9090f9ccb768aa9b58928c"
+  integrity sha512-0SFUwK5vc/p5rQiQwuYTQV56zIZHMuinyFE2BOVVbOBB49vRxSRPC+bz5Qe4CXkxbxbeFgj/9uyb/xIuv3PNSQ==
   dependencies:
-    comment-parser "^1.2.3"
+    comment-parser "1.1.5"
     prettier "^2.3.2"
     ramda "0.27.1"
 
@@ -2539,7 +2539,12 @@ commander@^7.2.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-7.2.0.tgz#a36cb57d0b501ce108e4d20559a150a391d97ab7"
   integrity sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==
 
-comment-parser@1.2.3, comment-parser@^1.2.3:
+comment-parser@1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/comment-parser/-/comment-parser-1.1.5.tgz#453627ef8f67dbcec44e79a9bd5baa37f0bce9b2"
+  integrity sha512-RePCE4leIhBlmrqiYTvaqEeGYg7qpSl4etaIabKtdOQVi+mSTIBBklGUwIr79GXYnl3LpMwmDw4KeR2stNc6FA==
+
+comment-parser@1.2.3:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/comment-parser/-/comment-parser-1.2.3.tgz#303a7eb99c9b2632efd594e183ccbd32042caf69"
   integrity sha512-vnqDwBSXSsdAkGS5NjwMIPelE47q+UkEgWKHvCDNhVIIaQSUFY6sNnEYGzdoPGMdpV+7KR3ZkRd7oyWIjtuvJg==
