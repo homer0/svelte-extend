@@ -76,6 +76,14 @@ class SvelteExtendRollupPlugin {
     this._filter = rollupUtils.createFilter(this._options.include, this._options.exclude);
   }
   /**
+   * Get the plugin current options.
+   *
+   * @type {SvelteExtendRollupPluginOptions}
+   */
+  getOptions() {
+    return this._options;
+  }
+  /**
    * The method Rollup calls when processing a file. It first validates if the file
    * matches the filter and then calls {@link SvelteExtend#extend}.
    *
@@ -101,14 +109,6 @@ class SvelteExtendRollupPlugin {
    */
   get name() {
     return this._name;
-  }
-  /**
-   * The plugin options.
-   *
-   * @type {SvelteExtendRollupPluginOptions}
-   */
-  get options() {
-    return this._options;
   }
 }
 
