@@ -74,6 +74,10 @@ class SvelteExtendRollupPlugin {
      * @ignore
      */
     this._filter = rollupUtils.createFilter(this._options.include, this._options.exclude);
+    /**
+     * @ignore
+     */
+    this.transform = this.transform.bind(this);
   }
   /**
    * Get the plugin current options.
@@ -95,7 +99,10 @@ class SvelteExtendRollupPlugin {
   transform(code, filepath) {
     let result;
     if (filepath.match(/\.svelte(?:$|\?)/i) && this._filter(filepath)) {
-      result = app.extend(code, filepath, this._options.allowedMaxDepth);
+      result = {
+        code: app.extend(code, filepath, this._options.allowedMaxDepth),
+        map: null,
+      };
     } else {
       result = null;
     }
