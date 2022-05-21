@@ -1,4 +1,3 @@
-const loaderUtils = require('loader-utils');
 const app = require('./index');
 /**
  * The loader that implements {@link SvelteExtend} for webpack.
@@ -11,7 +10,7 @@ const app = require('./index');
  * @param {string} source  The contents of the file to process.
  */
 module.exports = function svelteExtendWebpackLoader(source) {
-  const { allowedMaxDepth = 0 } = loaderUtils.getOptions(this) || {};
+  const { allowedMaxDepth = 0 } = this.getOptions() || {};
   const callback = this.async();
   app
     .extend(source, this.resourcePath, allowedMaxDepth)
