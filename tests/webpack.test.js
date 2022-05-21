@@ -1,7 +1,5 @@
-jest.mock('loader-utils');
 jest.unmock('../src/webpack');
 
-const loaderUtils = require('loader-utils');
 const app = require('../src/index');
 
 const svelteExtendWebpackLoader = require('../src/webpack');
@@ -9,7 +7,6 @@ const svelteExtendWebpackLoader = require('../src/webpack');
 describe('integrations:webpack', () => {
   beforeEach(() => {
     app.extend.mockReset();
-    loaderUtils.getOptions.mockReset();
   });
 
   it('should process a file', () => {
@@ -18,6 +15,7 @@ describe('integrations:webpack', () => {
     const context = {
       resourcePath: 'resource-path',
       async: jest.fn(() => callback),
+      getOptions: jest.fn(),
     };
     const result = 'formatted!';
     const fakePromise = {
@@ -32,8 +30,7 @@ describe('integrations:webpack', () => {
     // When
     svelteExtendWebpackLoader.bind(context)(source);
     // Then
-    expect(loaderUtils.getOptions).toHaveBeenCalledTimes(1);
-    expect(loaderUtils.getOptions).toHaveBeenCalledWith(context);
+    expect(context.getOptions).toHaveBeenCalledTimes(1);
     expect(context.async).toHaveBeenCalledTimes(1);
     expect(app.extend).toHaveBeenCalledTimes(1);
     expect(app.extend).toHaveBeenCalledWith(source, context.resourcePath, 0);
@@ -48,13 +45,13 @@ describe('integrations:webpack', () => {
   it('should process a file with a custom max depth option', () => {
     // Given
     const allowedMaxDepth = 12;
-    loaderUtils.getOptions.mockImplementationOnce(() => ({
-      allowedMaxDepth,
-    }));
     const callback = jest.fn();
     const context = {
       resourcePath: 'resource-path',
       async: jest.fn(() => callback),
+      getOptions: jest.fn(() => ({
+        allowedMaxDepth,
+      })),
     };
     const result = 'formatted!';
     const fakePromise = {
@@ -69,8 +66,7 @@ describe('integrations:webpack', () => {
     // When
     svelteExtendWebpackLoader.bind(context)(source);
     // Then
-    expect(loaderUtils.getOptions).toHaveBeenCalledTimes(1);
-    expect(loaderUtils.getOptions).toHaveBeenCalledWith(context);
+    expect(context.getOptions).toHaveBeenCalledTimes(1);
     expect(context.async).toHaveBeenCalledTimes(1);
     expect(app.extend).toHaveBeenCalledTimes(1);
     expect(app.extend).toHaveBeenCalledWith(
@@ -92,6 +88,7 @@ describe('integrations:webpack', () => {
     const context = {
       resourcePath: 'resource-path',
       async: jest.fn(() => callback),
+      getOptions: jest.fn(),
     };
     const error = new Error('DAMN');
     const fakePromise = {
@@ -105,8 +102,7 @@ describe('integrations:webpack', () => {
     // When
     svelteExtendWebpackLoader.bind(context)(source);
     // Then
-    expect(loaderUtils.getOptions).toHaveBeenCalledTimes(1);
-    expect(loaderUtils.getOptions).toHaveBeenCalledWith(context);
+    expect(context.getOptions).toHaveBeenCalledTimes(1);
     expect(context.async).toHaveBeenCalledTimes(1);
     expect(app.extend).toHaveBeenCalledTimes(1);
     expect(app.extend).toHaveBeenCalledWith(source, context.resourcePath, 0);
