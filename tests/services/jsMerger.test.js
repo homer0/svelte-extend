@@ -1,26 +1,23 @@
-// eslint-disable-next-line global-require
+/* eslint-disable global-require */
 jest.mock('jimple', () => require('../mocks/jimple.mock'));
+jest.mock('@babel/types', () => require('../mocks/babelTypes.mock'));
+jest.mock('@babel/traverse', () => require('../mocks/babelTraverse.mock'));
+/* eslint-enable global-require */
 jest.mock('babylon');
-jest.mock('@babel/traverse');
-jest.mock('@babel/types');
 jest.mock('@babel/generator');
 jest.unmock('../../src/services/jsMerger');
 
 const babylon = require('babylon');
-const babelTraverse = require('@babel/traverse').default;
-const babelTypes = require('@babel/types');
 const babelGenerator = require('@babel/generator').default;
+const babelTraverse = require('../mocks/babelTraverse.mock');
+const babelTypes = require('../mocks/babelTypes.mock');
 const { JSMerger, jsMerger } = require('../../src/services/jsMerger');
 
 describe('JSMerger', () => {
   beforeEach(() => {
     babylon.parse.mockReset();
-    babelTraverse.mockReset();
-    babelTypes.isProgram.mockReset();
-    babelTypes.isImportDeclaration.mockReset();
-    babelTypes.isVariableDeclaration.mockReset();
-    babelTypes.isExportNamedDeclaration.mockReset();
-    babelTypes.isFunctionDeclaration.mockReset();
+    babelTraverse.mockClear();
+    babelTypes.mockClear();
     babelGenerator.mockReset();
   });
 
@@ -51,18 +48,20 @@ describe('JSMerger', () => {
     // Then
     expect(result).toBe(`${baseCode}\n${extendedCode}`);
     expect(babylon.parse).toHaveBeenCalledTimes(2);
-    expect(babylon.parse).toHaveBeenCalledWith(baseCode, { sourceType: 'module' });
-    expect(babylon.parse).toHaveBeenCalledWith(extendedCode, { sourceType: 'module' });
-    expect(babelTraverse).toHaveBeenCalledTimes(2);
-    expect(babelTraverse).toHaveBeenCalledWith(baseAST, {
+    expect(babylon.parse).toHaveBeenNthCalledWith(1, baseCode, { sourceType: 'module' });
+    expect(babylon.parse).toHaveBeenNthCalledWith(2, extendedCode, {
+      sourceType: 'module',
+    });
+    expect(babelTraverse.default).toHaveBeenCalledTimes(2);
+    expect(babelTraverse.default).toHaveBeenNthCalledWith(1, baseAST, {
       enter: expect.any(Function),
     });
-    expect(babelTraverse).toHaveBeenCalledWith(extendedAST, {
+    expect(babelTraverse.default).toHaveBeenNthCalledWith(2, extendedAST, {
       enter: expect.any(Function),
     });
     expect(babelGenerator).toHaveBeenCalledTimes(2);
-    expect(babelGenerator).toHaveBeenCalledWith(baseAST, {}, baseCode);
-    expect(babelGenerator).toHaveBeenCalledWith(extendedAST, {}, extendedCode);
+    expect(babelGenerator).toHaveBeenNthCalledWith(1, baseAST, {}, baseCode);
+    expect(babelGenerator).toHaveBeenNthCalledWith(2, extendedAST, {}, extendedCode);
   });
 
   it('should merge two JS blocks and move import statements to the top', () => {
@@ -86,7 +85,7 @@ describe('JSMerger', () => {
     babelTypes.isImportDeclaration.mockImplementationOnce(() => true);
     babelTypes.isImportDeclaration.mockImplementationOnce(() => false);
     babylon.parse.mockImplementationOnce(() => baseAST);
-    babelTraverse.mockImplementationOnce((_, fns) => {
+    babelTraverse.default.mockImplementationOnce((_, fns) => {
       baseNodes.forEach((baseNode) => {
         fns.enter(baseNode);
       });
@@ -104,7 +103,7 @@ describe('JSMerger', () => {
     babelTypes.isProgram.mockImplementationOnce(() => true);
     babelTypes.isImportDeclaration.mockImplementationOnce(() => true);
     babylon.parse.mockImplementationOnce(() => extendedAST);
-    babelTraverse.mockImplementationOnce((_, fns) => {
+    babelTraverse.default.mockImplementationOnce((_, fns) => {
       extendedNodes.forEach((extendedNode) => {
         fns.enter(extendedNode);
       });
@@ -177,7 +176,7 @@ describe('JSMerger', () => {
     babelTypes.isExportNamedDeclaration.mockImplementationOnce(() => true);
     babelTypes.isExportNamedDeclaration.mockImplementationOnce(() => true);
     babylon.parse.mockImplementationOnce(() => baseAST);
-    babelTraverse.mockImplementationOnce((_, fns) => {
+    babelTraverse.default.mockImplementationOnce((_, fns) => {
       baseNodes.forEach((baseNode) => {
         fns.enter(baseNode);
       });
@@ -227,7 +226,7 @@ describe('JSMerger', () => {
     babelTypes.isExportNamedDeclaration.mockImplementationOnce(() => true);
     babelTypes.isExportNamedDeclaration.mockImplementationOnce(() => true);
     babylon.parse.mockImplementationOnce(() => extendedAST);
-    babelTraverse.mockImplementationOnce((_, fns) => {
+    babelTraverse.default.mockImplementationOnce((_, fns) => {
       extendedNodes.forEach((extendedNode) => {
         fns.enter(extendedNode);
       });
@@ -239,7 +238,6 @@ describe('JSMerger', () => {
     // When
     sut = new JSMerger();
     result = sut.mergeCode(baseCode, extendedCode);
-
     // Then
     expect(result).toBe(`${baseCode}\n${extendedCode}`);
     expect(babelTypes.isVariableDeclaration).toHaveBeenCalledTimes(allNodes.length);
@@ -299,7 +297,7 @@ describe('JSMerger', () => {
     babelTypes.isVariableDeclaration.mockImplementationOnce(() => true);
     babelTypes.isVariableDeclaration.mockImplementationOnce(() => true);
     babylon.parse.mockImplementationOnce(() => baseAST);
-    babelTraverse.mockImplementationOnce((_, fns) => {
+    babelTraverse.default.mockImplementationOnce((_, fns) => {
       baseNodes.forEach((baseNode) => {
         fns.enter(baseNode);
       });
@@ -339,7 +337,7 @@ describe('JSMerger', () => {
     babelTypes.isVariableDeclaration.mockImplementationOnce(() => true);
     babelTypes.isVariableDeclaration.mockImplementationOnce(() => true);
     babylon.parse.mockImplementationOnce(() => extendedAST);
-    babelTraverse.mockImplementationOnce((_, fns) => {
+    babelTraverse.default.mockImplementationOnce((_, fns) => {
       extendedNodes.forEach((extendedNode) => {
         fns.enter(extendedNode);
       });
@@ -406,7 +404,7 @@ describe('JSMerger', () => {
     babelTypes.isFunctionDeclaration.mockImplementationOnce(() => true);
     babelTypes.isFunctionDeclaration.mockImplementationOnce(() => true);
     babylon.parse.mockImplementationOnce(() => baseAST);
-    babelTraverse.mockImplementationOnce((_, fns) => {
+    babelTraverse.default.mockImplementationOnce((_, fns) => {
       baseNodes.forEach((baseNode) => {
         fns.enter(baseNode);
       });
@@ -438,7 +436,7 @@ describe('JSMerger', () => {
     babelTypes.isFunctionDeclaration.mockImplementationOnce(() => true);
     babelTypes.isFunctionDeclaration.mockImplementationOnce(() => true);
     babylon.parse.mockImplementationOnce(() => extendedAST);
-    babelTraverse.mockImplementationOnce((_, fns) => {
+    babelTraverse.default.mockImplementationOnce((_, fns) => {
       extendedNodes.forEach((extendedNode) => {
         fns.enter(extendedNode);
       });
