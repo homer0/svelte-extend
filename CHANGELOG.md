@@ -1,3 +1,18 @@
+# [4.0.0](https://github.com/homer0/svelte-extend/compare/3.0.1...4.0.0) (2022-05-21)
+
+
+### Bug Fixes
+
+* drop support for Node 12 ([30e1134](https://github.com/homer0/svelte-extend/commit/30e11341675f78b0847f86da850849a8b19a4cd4))
+* update dependencies ([4b02687](https://github.com/homer0/svelte-extend/commit/4b02687f32f7ce66b3b8c8f8c0ae65fb94861249))
+* update the loader for webpack 5 ([46247b5](https://github.com/homer0/svelte-extend/commit/46247b5aaf0d11c6a81fad451f9dc94c0e83768c))
+
+
+### BREAKING CHANGES
+
+* This loader now only works on webpack >= 5.
+* This package no longer supports Node 12.
+
 ## [3.0.1](https://github.com/homer0/svelte-extend/compare/3.0.0...3.0.1) (2021-08-02)
 
 

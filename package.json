@@ -2,7 +2,7 @@
   "name": "svelte-extend",
   "description": "Create new Svelte components by extending existing ones",
   "homepage": "https://homer0.github.io/svelte-extend/",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "repository": "homer0/svelte-extend",
   "author": "Leonardo Apiwan (@homer0) <me@homer0.com>",
   "license": "MIT",
