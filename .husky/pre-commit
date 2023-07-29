@@ -1,8 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-if hash yarn 2>/dev/null; then
-  yarn run lint
-else
-  npm run lint
-fi
+npm run lint

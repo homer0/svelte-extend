@@ -1,6 +1,6 @@
 /**
  * @external Jimple
- * @see https://yarnpkg.com/en/package/jimple
+ * @see https://www.npmjs.com/package/jimple
  */
 
 /**

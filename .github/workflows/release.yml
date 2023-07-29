@@ -16,19 +16,19 @@ jobs:
         id: nvm
       - uses: actions/setup-node@v1
         with:
-          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+          node-version: '18'
       - name: Install dependencies
         env:
-          HUSKY_SKIP_INSTALL: 1
-        run: yarn --frozen-lockfile
-      - run: yarn semantic-release
+          HUSKY: 0
+        run: npm ci && npm i semantic-release@^21.0.7 @semantic-release/changelog@^6.0.3 @semantic-release/git@^10.0.1 -g
+      - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Generate documentation
-        run: yarn docs
+        run: npm run docs
       - name: Deploy documentation
-        uses: JamesIves/github-pages-deploy-action@4.1.1
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           BRANCH: gh-pages
           FOLDER: docs

@@ -14,11 +14,9 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node }}
-      - run: yarn --frozen-lockfile
-      - run: yarn lint:all
-      - run: yarn test
+      - run: npm ci
+      - run: npm run lint:all
+      - run: npm test
       - name: Coveralls
-        if: ${{ matrix.node == '16' }}
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ matrix.node == '18' }}
+        uses: coverallsapp/github-action@v2
