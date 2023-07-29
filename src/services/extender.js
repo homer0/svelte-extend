@@ -46,7 +46,8 @@ class Extender {
     this._expressions = {
       htmlSrc: /\s+(?:src="(\.[^"]+)"|src='(\.[^']+)')/gi,
       cssUrl: /url\s*\(\s*(?:['"])?(\.[^"']+)(?:['"])?\)/gi,
-      jsPaths: /(?: |^)(?:(?:from|import)\s+(?:["'](\.[^"']+)["'])|require\s*\(\s*["'](\.[^"']+)["']\s*\))/gim,
+      jsPaths:
+        /(?: |^)(?:(?:from|import)\s+(?:["'](\.[^"']+)["'])|require\s*\(\s*["'](\.[^"']+)["']\s*\))/gim,
     };
     /**
      * A list of private attributes used by the application and that should be removed

@@ -7,14 +7,14 @@ const appServices = {
   sfcData: 'app-sfcData',
   sfcParser: 'app-sfcParser',
 };
-jest.mock('fs-extra');
+jest.mock('fs/promises');
 // eslint-disable-next-line global-require
 jest.mock('jimple', () => require('../mocks/jimple.mock'));
 jest.mock('wootils/node/logger', () => wootilsServices);
 jest.mock('../../src/services', () => appServices);
 jest.unmock('../../src/app/index');
 
-const fs = require('fs-extra');
+const fs = require('fs/promises');
 const JimpleMock = require('../mocks/jimple.mock');
 const SvelteExtend = require('../../src/app');
 

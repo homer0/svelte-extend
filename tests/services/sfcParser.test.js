@@ -1,15 +1,15 @@
 /* eslint-disable max-classes-per-file */
-jest.mock('fs-extra');
+jest.mock('fs/promises');
 // eslint-disable-next-line global-require
 jest.mock('jimple', () => require('../mocks/jimple.mock'));
 jest.unmock('../../src/services/sfcParser');
 
-const fs = require('fs-extra');
+const fs = require('fs/promises');
 const { SFCParser, sfcParser } = require('../../src/services/sfcParser');
 
 describe('SFCParser', () => {
   beforeEach(() => {
-    fs.pathExists.mockReset();
+    fs.access.mockReset();
     fs.readFile.mockReset();
   });
 
@@ -30,27 +30,21 @@ describe('SFCParser', () => {
     });
   });
 
-  it("should fail to parse a file if the base file doesn't exist", () => {
+  it("should fail to parse a file if the base file doesn't exist", async () => {
     const baseFile = 'base.svelte';
     const targetFile = 'target.svelte';
     const targetExtendTag = `<extend from="./${baseFile}" html />`;
     const targetMarkup = '<marquee>daaaamn</marquee>';
     const targetContents = [targetExtendTag, targetMarkup].join('\n');
-    fs.pathExists.mockImplementationOnce(() => Promise.resolve(false));
+    fs.access.mockRejectedValueOnce(new Error('File not found'));
     let sut = null;
     sut = new SFCParser();
-    return sut
-      .parse(targetContents, targetFile)
-      .then(() => {
-        expect(true).toBeFalse();
-      })
-      .catch((error) => {
-        expect(error).toBeInstanceOf(Error);
-        expect(error.message).toMatch(/unable to load/i);
-      });
+    await expect(() => sut.parse(targetContents, targetFile)).rejects.toThrow(
+      /unable to load/i,
+    );
   });
 
-  it('should fail to parse a file that has multiple tags on the same line', () => {
+  it('should fail to parse a file that has multiple tags on the same line', async () => {
     const baseFile = 'base.svelte';
     const baseModuleScript = 'alert(window)';
     const baseScript = 'console.log(window);';
@@ -85,29 +79,21 @@ describe('SFCParser', () => {
         return sfcDataConstructor(...args);
       }
     }
-    fs.pathExists.mockImplementationOnce(() => Promise.resolve(true));
+    fs.access.mockResolvedValueOnce();
     fs.readFile.mockImplementationOnce(() => Promise.resolve(baseContents));
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut
-      .parse(targetContents, targetFile)
-      .then(() => {
-        expect(true).toBeFalse();
-      })
-      .catch((error) => {
-        expect(error).toBeInstanceOf(Error);
-        expect(error.message).toBe(
-          [
-            'The parser cant handle multiple script/style tags on the same line (sorry!)',
-            `- file: ${baseFile}`,
-            '- line: 1',
-            `- code: ${problemLine}`,
-          ].join('\n'),
-        );
-      });
+    await expect(() => sut.parse(targetContents, targetFile)).rejects.toThrow(
+      [
+        'The parser cant handle multiple script/style tags on the same line (sorry!)',
+        `- file: ${baseFile}`,
+        '- line: 1',
+        `- code: ${problemLine}`,
+      ].join('\n'),
+    );
   });
 
-  it('should parse a file', () => {
+  it('should parse a file', async () => {
     const baseFile = 'base.svelte';
     const baseModuleScript = 'alert(window)';
     const baseScript = 'console.log(window);';
@@ -142,40 +128,39 @@ describe('SFCParser', () => {
         return sfcDataConstructor(...args);
       }
     }
-    fs.pathExists.mockImplementationOnce(() => Promise.resolve(true));
+    fs.access.mockResolvedValueOnce();
     fs.readFile.mockImplementationOnce(() => Promise.resolve(baseContents));
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parse(targetContents, targetFile).then((result) => {
-      expect(result).toBe(newData);
-      expect(fs.pathExists).toHaveBeenCalledTimes(1);
-      expect(fs.pathExists).toHaveBeenCalledWith(baseFile);
-      expect(fs.readFile).toHaveBeenCalledTimes(1);
-      expect(fs.readFile).toHaveBeenCalledWith(baseFile, 'utf-8');
-      expect(sfcDataConstructor).toHaveBeenCalledTimes(2);
-      expect(sfcDataConstructor).toHaveBeenCalledWith(baseFile);
-      expect(sfcDataConstructor).toHaveBeenCalledWith(targetFile);
-      expect(newData.addBaseFileData).toHaveBeenCalledTimes(1);
-      expect(newData.addBaseFileData).toHaveBeenCalledWith(newData, {
-        from: `./${baseFile}`,
-        html: true,
-      });
-      expect(newData.addMarkup).toHaveBeenCalledTimes(2);
-      expect(newData.addMarkup).toHaveBeenCalledWith(baseMarkup);
-      expect(newData.addMarkup).toHaveBeenCalledWith(targetMarkup);
-      expect(newData.addScript).toHaveBeenCalledTimes(2);
-      expect(newData.addScript).toHaveBeenCalledWith(baseModuleScript, {
-        context: 'module',
-      });
-      expect(newData.addScript).toHaveBeenCalledWith(baseScript, {});
-      expect(newData.addStyle).toHaveBeenCalledTimes(1);
-      expect(newData.addStyle).toHaveBeenCalledWith(baseStyle, {
-        extend: true,
-      });
+    const result = await sut.parse(targetContents, targetFile);
+    expect(result).toBe(newData);
+    expect(fs.access).toHaveBeenCalledTimes(1);
+    expect(fs.access).toHaveBeenCalledWith(baseFile);
+    expect(fs.readFile).toHaveBeenCalledTimes(1);
+    expect(fs.readFile).toHaveBeenCalledWith(baseFile, 'utf-8');
+    expect(sfcDataConstructor).toHaveBeenCalledTimes(2);
+    expect(sfcDataConstructor).toHaveBeenCalledWith(baseFile);
+    expect(sfcDataConstructor).toHaveBeenCalledWith(targetFile);
+    expect(newData.addBaseFileData).toHaveBeenCalledTimes(1);
+    expect(newData.addBaseFileData).toHaveBeenCalledWith(newData, {
+      from: `./${baseFile}`,
+      html: true,
+    });
+    expect(newData.addMarkup).toHaveBeenCalledTimes(2);
+    expect(newData.addMarkup).toHaveBeenCalledWith(baseMarkup);
+    expect(newData.addMarkup).toHaveBeenCalledWith(targetMarkup);
+    expect(newData.addScript).toHaveBeenCalledTimes(2);
+    expect(newData.addScript).toHaveBeenCalledWith(baseModuleScript, {
+      context: 'module',
+    });
+    expect(newData.addScript).toHaveBeenCalledWith(baseScript, {});
+    expect(newData.addStyle).toHaveBeenCalledTimes(1);
+    expect(newData.addStyle).toHaveBeenCalledWith(baseStyle, {
+      extend: true,
     });
   });
 
-  it('should parse a file with text lines on the markup', () => {
+  it('should parse a file with text lines on the markup', async () => {
     const baseFile = 'base.svelte';
     const baseModuleScript = 'alert(window)';
     const baseScript = 'console.log(window);';
@@ -218,40 +203,39 @@ describe('SFCParser', () => {
         return sfcDataConstructor(...args);
       }
     }
-    fs.pathExists.mockImplementationOnce(() => Promise.resolve(true));
+    fs.access.mockResolvedValueOnce();
     fs.readFile.mockImplementationOnce(() => Promise.resolve(baseContents));
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parse(targetContents, targetFile).then((result) => {
-      expect(result).toBe(newData);
-      expect(fs.pathExists).toHaveBeenCalledTimes(1);
-      expect(fs.pathExists).toHaveBeenCalledWith(baseFile);
-      expect(fs.readFile).toHaveBeenCalledTimes(1);
-      expect(fs.readFile).toHaveBeenCalledWith(baseFile, 'utf-8');
-      expect(sfcDataConstructor).toHaveBeenCalledTimes(2);
-      expect(sfcDataConstructor).toHaveBeenCalledWith(baseFile);
-      expect(sfcDataConstructor).toHaveBeenCalledWith(targetFile);
-      expect(newData.addBaseFileData).toHaveBeenCalledTimes(1);
-      expect(newData.addBaseFileData).toHaveBeenCalledWith(newData, {
-        from: `./${baseFile}`,
-        html: true,
-      });
-      expect(newData.addMarkup).toHaveBeenCalledTimes(2);
-      expect(newData.addMarkup).toHaveBeenCalledWith(baseMarkup);
-      expect(newData.addMarkup).toHaveBeenCalledWith(targetMarkup);
-      expect(newData.addScript).toHaveBeenCalledTimes(2);
-      expect(newData.addScript).toHaveBeenCalledWith(baseModuleScript, {
-        context: 'module',
-      });
-      expect(newData.addScript).toHaveBeenCalledWith(baseScript, {});
-      expect(newData.addStyle).toHaveBeenCalledTimes(1);
-      expect(newData.addStyle).toHaveBeenCalledWith(baseStyle, {
-        extend: true,
-      });
+    const result = await sut.parse(targetContents, targetFile);
+    expect(result).toBe(newData);
+    expect(fs.access).toHaveBeenCalledTimes(1);
+    expect(fs.access).toHaveBeenCalledWith(baseFile);
+    expect(fs.readFile).toHaveBeenCalledTimes(1);
+    expect(fs.readFile).toHaveBeenCalledWith(baseFile, 'utf-8');
+    expect(sfcDataConstructor).toHaveBeenCalledTimes(2);
+    expect(sfcDataConstructor).toHaveBeenCalledWith(baseFile);
+    expect(sfcDataConstructor).toHaveBeenCalledWith(targetFile);
+    expect(newData.addBaseFileData).toHaveBeenCalledTimes(1);
+    expect(newData.addBaseFileData).toHaveBeenCalledWith(newData, {
+      from: `./${baseFile}`,
+      html: true,
+    });
+    expect(newData.addMarkup).toHaveBeenCalledTimes(2);
+    expect(newData.addMarkup).toHaveBeenCalledWith(baseMarkup);
+    expect(newData.addMarkup).toHaveBeenCalledWith(targetMarkup);
+    expect(newData.addScript).toHaveBeenCalledTimes(2);
+    expect(newData.addScript).toHaveBeenCalledWith(baseModuleScript, {
+      context: 'module',
+    });
+    expect(newData.addScript).toHaveBeenCalledWith(baseScript, {});
+    expect(newData.addStyle).toHaveBeenCalledTimes(1);
+    expect(newData.addStyle).toHaveBeenCalledWith(baseStyle, {
+      extend: true,
     });
   });
 
-  it('should parse a file with nested tags', () => {
+  it('should parse a file with nested tags', async () => {
     const baseFile = 'base.svelte';
     const baseModuleScript = 'alert(window)';
     const baseScript = [
@@ -297,40 +281,39 @@ describe('SFCParser', () => {
         return sfcDataConstructor(...args);
       }
     }
-    fs.pathExists.mockImplementationOnce(() => Promise.resolve(true));
-    fs.readFile.mockImplementationOnce(() => Promise.resolve(baseContents));
+    fs.access.mockResolvedValueOnce();
+    fs.readFile.mockResolvedValueOnce(baseContents);
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parse(targetContents, targetFile).then((result) => {
-      expect(result).toBe(newData);
-      expect(fs.pathExists).toHaveBeenCalledTimes(1);
-      expect(fs.pathExists).toHaveBeenCalledWith(baseFile);
-      expect(fs.readFile).toHaveBeenCalledTimes(1);
-      expect(fs.readFile).toHaveBeenCalledWith(baseFile, 'utf-8');
-      expect(sfcDataConstructor).toHaveBeenCalledTimes(2);
-      expect(sfcDataConstructor).toHaveBeenCalledWith(baseFile);
-      expect(sfcDataConstructor).toHaveBeenCalledWith(targetFile);
-      expect(newData.addBaseFileData).toHaveBeenCalledTimes(1);
-      expect(newData.addBaseFileData).toHaveBeenCalledWith(newData, {
-        from: `./${baseFile}`,
-        html: true,
-      });
-      expect(newData.addMarkup).toHaveBeenCalledTimes(2);
-      expect(newData.addMarkup).toHaveBeenCalledWith(baseMarkup);
-      expect(newData.addMarkup).toHaveBeenCalledWith(targetMarkup);
-      expect(newData.addScript).toHaveBeenCalledTimes(2);
-      expect(newData.addScript).toHaveBeenCalledWith(baseModuleScript, {
-        context: 'module',
-      });
-      expect(newData.addScript).toHaveBeenCalledWith(baseScript, {});
-      expect(newData.addStyle).toHaveBeenCalledTimes(1);
-      expect(newData.addStyle).toHaveBeenCalledWith(baseStyle, {
-        extend: true,
-      });
+    const result = await sut.parse(targetContents, targetFile);
+    expect(result).toBe(newData);
+    expect(fs.access).toHaveBeenCalledTimes(1);
+    expect(fs.access).toHaveBeenCalledWith(baseFile);
+    expect(fs.readFile).toHaveBeenCalledTimes(1);
+    expect(fs.readFile).toHaveBeenCalledWith(baseFile, 'utf-8');
+    expect(sfcDataConstructor).toHaveBeenCalledTimes(2);
+    expect(sfcDataConstructor).toHaveBeenCalledWith(baseFile);
+    expect(sfcDataConstructor).toHaveBeenCalledWith(targetFile);
+    expect(newData.addBaseFileData).toHaveBeenCalledTimes(1);
+    expect(newData.addBaseFileData).toHaveBeenCalledWith(newData, {
+      from: `./${baseFile}`,
+      html: true,
+    });
+    expect(newData.addMarkup).toHaveBeenCalledTimes(2);
+    expect(newData.addMarkup).toHaveBeenCalledWith(baseMarkup);
+    expect(newData.addMarkup).toHaveBeenCalledWith(targetMarkup);
+    expect(newData.addScript).toHaveBeenCalledTimes(2);
+    expect(newData.addScript).toHaveBeenCalledWith(baseModuleScript, {
+      context: 'module',
+    });
+    expect(newData.addScript).toHaveBeenCalledWith(baseScript, {});
+    expect(newData.addStyle).toHaveBeenCalledTimes(1);
+    expect(newData.addStyle).toHaveBeenCalledWith(baseStyle, {
+      extend: true,
     });
   });
 
-  it('should parse a file that extends an already extended file', () => {
+  it('should parse a file that extends an already extended file', async () => {
     const baseFile = 'base.svelte';
     const baseModuleScript = 'alert(window)';
     const baseScript = "console.log('Batman');";
@@ -375,49 +358,48 @@ describe('SFCParser', () => {
         });
       }
     }
-    fs.pathExists.mockImplementationOnce(() => Promise.resolve(true));
-    fs.pathExists.mockImplementationOnce(() => Promise.resolve(true));
-    fs.readFile.mockImplementationOnce(() => Promise.resolve(subContents));
-    fs.readFile.mockImplementationOnce(() => Promise.resolve(baseContents));
+    fs.access.mockResolvedValueOnce();
+    fs.access.mockResolvedValueOnce();
+    fs.readFile.mockResolvedValueOnce(subContents);
+    fs.readFile.mockResolvedValueOnce(baseContents);
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parse(targetContents, targetFile).then((result) => {
-      expect(result).toBeInstanceOf(SFCData);
-      expect(fs.pathExists).toHaveBeenCalledTimes(2);
-      expect(fs.pathExists).toHaveBeenCalledWith(baseFile);
-      expect(fs.pathExists).toHaveBeenCalledWith(subFile);
-      expect(fs.readFile).toHaveBeenCalledTimes(2);
-      expect(fs.readFile).toHaveBeenCalledWith(baseFile, 'utf-8');
-      expect(fs.readFile).toHaveBeenCalledWith(subFile, 'utf-8');
-      expect(sfcDataConstructor).toHaveBeenCalledTimes(3);
-      expect(sfcDataConstructor).toHaveBeenCalledWith(baseFile);
-      expect(sfcDataConstructor).toHaveBeenCalledWith(subFile);
-      expect(sfcDataConstructor).toHaveBeenCalledWith(targetFile);
-      expect(newData.addBaseFileData).toHaveBeenCalledTimes(2);
-      expect(newData.addBaseFileData).toHaveBeenCalledWith(newData, {
-        from: `./${baseFile}`,
-        html: true,
-      });
-      expect(newData.addBaseFileData).toHaveBeenCalledWith(newData, {
-        from: `./${subFile}`,
-      });
-      expect(newData.addMarkup).toHaveBeenCalledTimes(3);
-      expect(newData.addMarkup).toHaveBeenCalledWith(baseMarkup);
-      expect(newData.addMarkup).toHaveBeenCalledWith(subMarkup);
-      expect(newData.addMarkup).toHaveBeenCalledWith(targetMarkup);
-      expect(newData.addScript).toHaveBeenCalledTimes(2);
-      expect(newData.addScript).toHaveBeenCalledWith(baseModuleScript, {
-        context: 'module',
-      });
-      expect(newData.addScript).toHaveBeenCalledWith(baseScript, {});
-      expect(newData.addStyle).toHaveBeenCalledTimes(1);
-      expect(newData.addStyle).toHaveBeenCalledWith(baseStyle, {
-        extend: true,
-      });
+    const result = await sut.parse(targetContents, targetFile);
+    expect(result).toBeInstanceOf(SFCData);
+    expect(fs.access).toHaveBeenCalledTimes(2);
+    expect(fs.access).toHaveBeenCalledWith(baseFile);
+    expect(fs.access).toHaveBeenCalledWith(subFile);
+    expect(fs.readFile).toHaveBeenCalledTimes(2);
+    expect(fs.readFile).toHaveBeenCalledWith(baseFile, 'utf-8');
+    expect(fs.readFile).toHaveBeenCalledWith(subFile, 'utf-8');
+    expect(sfcDataConstructor).toHaveBeenCalledTimes(3);
+    expect(sfcDataConstructor).toHaveBeenCalledWith(baseFile);
+    expect(sfcDataConstructor).toHaveBeenCalledWith(subFile);
+    expect(sfcDataConstructor).toHaveBeenCalledWith(targetFile);
+    expect(newData.addBaseFileData).toHaveBeenCalledTimes(2);
+    expect(newData.addBaseFileData).toHaveBeenCalledWith(newData, {
+      from: `./${baseFile}`,
+      html: true,
+    });
+    expect(newData.addBaseFileData).toHaveBeenCalledWith(newData, {
+      from: `./${subFile}`,
+    });
+    expect(newData.addMarkup).toHaveBeenCalledTimes(3);
+    expect(newData.addMarkup).toHaveBeenCalledWith(baseMarkup);
+    expect(newData.addMarkup).toHaveBeenCalledWith(subMarkup);
+    expect(newData.addMarkup).toHaveBeenCalledWith(targetMarkup);
+    expect(newData.addScript).toHaveBeenCalledTimes(2);
+    expect(newData.addScript).toHaveBeenCalledWith(baseModuleScript, {
+      context: 'module',
+    });
+    expect(newData.addScript).toHaveBeenCalledWith(baseScript, {});
+    expect(newData.addStyle).toHaveBeenCalledTimes(1);
+    expect(newData.addStyle).toHaveBeenCalledWith(baseStyle, {
+      extend: true,
     });
   });
 
-  it('should fail to parse when trying to extend below the allowed depth', () => {
+  it('should fail to parse when trying to extend below the allowed depth', async () => {
     const baseFile = 'base.svelte';
     const subFile = 'sub.svelte';
     const subExtendTag = `<extend from="./${baseFile}" html />`;
@@ -446,24 +428,18 @@ describe('SFCParser', () => {
         });
       }
     }
-    fs.pathExists.mockImplementationOnce(() => Promise.resolve(true));
-    fs.pathExists.mockImplementationOnce(() => Promise.resolve(true));
-    fs.readFile.mockImplementationOnce(() => Promise.resolve(subContents));
+    fs.access.mockResolvedValueOnce();
+    fs.access.mockResolvedValueOnce();
+    fs.readFile.mockResolvedValueOnce(subContents);
     const maxDepth = 1;
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut
-      .parse(targetContents, targetFile, maxDepth)
-      .then(() => {
-        expect(true).toBeFalse();
-      })
-      .catch((error) => {
-        expect(error).toBeInstanceOf(Error);
-        expect(error.message).toMatch(/can't extend from another file/i);
-      });
+    await expect(() => sut.parse(targetContents, targetFile, maxDepth)).rejects.toThrow(
+      /can't extend from another file/i,
+    );
   });
 
-  it('should fail to parse when trying to extend below the allowed depth (filepath)', () => {
+  it('should fail to parse when trying to extend below the allowed depth (filepath)', async () => {
     const baseFile = 'base.svelte';
     const subFile = 'sub.svelte';
     const subExtendTag = `<extend from="./${baseFile}" html />`;
@@ -492,25 +468,19 @@ describe('SFCParser', () => {
         });
       }
     }
-    fs.pathExists.mockImplementationOnce(() => Promise.resolve(true));
-    fs.pathExists.mockImplementationOnce(() => Promise.resolve(true));
-    fs.readFile.mockImplementationOnce(() => Promise.resolve(targetContents));
-    fs.readFile.mockImplementationOnce(() => Promise.resolve(subContents));
+    fs.access.mockResolvedValueOnce();
+    fs.access.mockResolvedValueOnce();
+    fs.readFile.mockResolvedValueOnce(targetContents);
+    fs.readFile.mockResolvedValueOnce(subContents);
     const maxDepth = 1;
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut
-      .parseFromPath(targetFile, maxDepth)
-      .then(() => {
-        expect(true).toBeFalse();
-      })
-      .catch((error) => {
-        expect(error).toBeInstanceOf(Error);
-        expect(error.message).toMatch(/can't extend from another file/i);
-      });
+    await expect(() => sut.parseFromPath(targetFile, maxDepth)).rejects.toThrow(
+      /can't extend from another file/i,
+    );
   });
 
-  it('should parse a file from its path', () => {
+  it('should parse a file from its path', async () => {
     const baseFile = 'base.svelte';
     const baseModuleScript = 'alert(window)';
     const baseScript = 'console.log(window);';
@@ -546,38 +516,37 @@ describe('SFCParser', () => {
         return sfcDataConstructor(...args);
       }
     }
-    fs.pathExists.mockImplementationOnce(() => Promise.resolve(true));
-    fs.readFile.mockImplementationOnce(() => Promise.resolve(targetContents));
-    fs.readFile.mockImplementationOnce(() => Promise.resolve(baseContents));
+    fs.access.mockResolvedValueOnce();
+    fs.readFile.mockResolvedValueOnce(targetContents);
+    fs.readFile.mockResolvedValueOnce(baseContents);
     let sut = null;
     sut = new SFCParser(SFCData);
-    return sut.parseFromPath(targetFile).then((result) => {
-      expect(result).toBe(newData);
-      expect(fs.pathExists).toHaveBeenCalledTimes(1);
-      expect(fs.pathExists).toHaveBeenCalledWith(baseFile);
-      expect(fs.readFile).toHaveBeenCalledTimes(2);
-      expect(fs.readFile).toHaveBeenCalledWith(targetFile, 'utf-8');
-      expect(fs.readFile).toHaveBeenCalledWith(baseFile, 'utf-8');
-      expect(sfcDataConstructor).toHaveBeenCalledTimes(2);
-      expect(sfcDataConstructor).toHaveBeenCalledWith(baseFile);
-      expect(sfcDataConstructor).toHaveBeenCalledWith(targetFile);
-      expect(newData.addBaseFileData).toHaveBeenCalledTimes(1);
-      expect(newData.addBaseFileData).toHaveBeenCalledWith(newData, {
-        from: `./${baseFile}`,
-        html: true,
-      });
-      expect(newData.addMarkup).toHaveBeenCalledTimes(2);
-      expect(newData.addMarkup).toHaveBeenCalledWith(baseMarkup);
-      expect(newData.addMarkup).toHaveBeenCalledWith(targetMarkup);
-      expect(newData.addScript).toHaveBeenCalledTimes(2);
-      expect(newData.addScript).toHaveBeenCalledWith(baseModuleScript, {
-        context: 'module',
-      });
-      expect(newData.addScript).toHaveBeenCalledWith(baseScript, {});
-      expect(newData.addStyle).toHaveBeenCalledTimes(1);
-      expect(newData.addStyle).toHaveBeenCalledWith(baseStyle, {
-        extend: true,
-      });
+    const result = await sut.parseFromPath(targetFile);
+    expect(result).toBe(newData);
+    expect(fs.access).toHaveBeenCalledTimes(1);
+    expect(fs.access).toHaveBeenCalledWith(baseFile);
+    expect(fs.readFile).toHaveBeenCalledTimes(2);
+    expect(fs.readFile).toHaveBeenCalledWith(targetFile, 'utf-8');
+    expect(fs.readFile).toHaveBeenCalledWith(baseFile, 'utf-8');
+    expect(sfcDataConstructor).toHaveBeenCalledTimes(2);
+    expect(sfcDataConstructor).toHaveBeenCalledWith(baseFile);
+    expect(sfcDataConstructor).toHaveBeenCalledWith(targetFile);
+    expect(newData.addBaseFileData).toHaveBeenCalledTimes(1);
+    expect(newData.addBaseFileData).toHaveBeenCalledWith(newData, {
+      from: `./${baseFile}`,
+      html: true,
+    });
+    expect(newData.addMarkup).toHaveBeenCalledTimes(2);
+    expect(newData.addMarkup).toHaveBeenCalledWith(baseMarkup);
+    expect(newData.addMarkup).toHaveBeenCalledWith(targetMarkup);
+    expect(newData.addScript).toHaveBeenCalledTimes(2);
+    expect(newData.addScript).toHaveBeenCalledWith(baseModuleScript, {
+      context: 'module',
+    });
+    expect(newData.addScript).toHaveBeenCalledWith(baseScript, {});
+    expect(newData.addStyle).toHaveBeenCalledTimes(1);
+    expect(newData.addStyle).toHaveBeenCalledWith(baseStyle, {
+      extend: true,
     });
   });
 
