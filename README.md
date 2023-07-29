@@ -182,6 +182,10 @@ module.exports = {
 - `include` & `exclude`: The basic options for almost all Rollup plugins, to define which files should and shouldn't be processed by a plugin.
 - `allowedMaxDepth`: By default, the library allows you to also extend from already extended components, but if you want to limit how much "levels" a component could extend from, you can use this parameter. The default value is `0`, meaning it has no limit.
 
+#### Example
+
+You can find an example project on the [`examples/rollup`](https://github.com/homer0/svelte-extend/examples/rollup) folder.
+
 ## Development
 
 ### NPM tasks

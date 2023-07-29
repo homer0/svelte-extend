@@ -1,0 +1,26 @@
+{
+  "name": "svelte-extend-rollup",
+  "description": "svelte-extend: Rollup example",
+  "version": "0.0.0",
+  "repository": "homer0/svelte-extend",
+  "author": "Leonardo Apiwan (@homer0) <me@homer0.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@rollup/plugin-commonjs": "^25.0.3",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-terser": "0.4.3",
+    "mini-css-extract-plugin": "^2.7.6",
+    "rollup": "^3.27.0",
+    "rollup-plugin-livereload": "^2.0.5",
+    "rollup-plugin-serve": "^2.0.2",
+    "rollup-plugin-svelte": "^7.1.6",
+    "rollup-plugin-css-only": "^4.3.0",
+    "svelte": "^4.1.1",
+    "svelte-extend": "file:../../"
+  },
+  "scripts": {
+    "build": "NODE_ENV=production rollup -c",
+    "dev": "rollup -c -w"
+  }
+}
