@@ -47,7 +47,7 @@
   },
   "engine-strict": true,
   "engines": {
-    "node": ">=14"
+    "node": ">=16 <21"
   },
   "main": "src/index.js",
   "scripts": {
