@@ -1,0 +1,25 @@
+{
+  "name": "svelte-extend-webpack",
+  "description": "svelte-extend: webpack example",
+  "version": "0.0.0",
+  "repository": "homer0/svelte-extend",
+  "author": "Leonardo Apiwan (@homer0) <me@homer0.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "css-loader": "^6.8.1",
+    "eslint": "^8.46.0",
+    "eslint-plugin-svelte": "^2.32.4",
+    "mini-css-extract-plugin": "^2.7.6",
+    "svelte-extend": "file:../../",
+    "svelte-loader": "^3.1.9",
+    "svelte": "^4.1.1",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  },
+  "scripts": {
+    "build": "NODE_ENV=production webpack",
+    "dev": "webpack serve"
+  }
+}

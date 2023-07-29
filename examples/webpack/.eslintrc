@@ -1,0 +1,16 @@
+{
+  "root": true,
+  "plugins": ["@homer0"],
+  "extends": [
+    "plugin:@homer0/svelte-with-prettier"
+  ],
+  "overrides": [
+    {
+      "files": ["webpack.config.js"],
+      "extends": [
+        "plugin:@homer0/node-with-prettier",
+        "plugin:@homer0/jsdoc"
+      ]
+    }
+  ]
+}

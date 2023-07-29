@@ -145,6 +145,10 @@ The library includes a webpack loader that you can add to your configuration:
 
 - `allowedMaxDepth`: By default, the library allows you to also extend from already extended components, but if you want to limit how much "levels" a component could extend from, you can use this parameter. The default value is `0`, meaning it has no limit.
 
+#### Example
+
+You can find an example project on the [`examples/webpack`](https://github.com/homer0/svelte-extend/examples/webpack) folder.
+
 ### Rollup
 
 The library also includes a Rollup plugin:
