@@ -1,5 +1,5 @@
-const wootilsServices = {
-  appLogger: 'wootils-appLogger',
+const appLoggerModule = {
+  appLoggerProvider: 'appLogger',
 };
 const appServices = {
   extender: 'app-extender',
@@ -10,7 +10,7 @@ const appServices = {
 jest.mock('fs/promises');
 // eslint-disable-next-line global-require
 jest.mock('@homer0/jimple', () => require('../mocks/jimple.mock'));
-jest.mock('wootils/node/logger', () => wootilsServices);
+jest.mock('@homer0/simple-logger', () => appLoggerModule);
 jest.mock('../../src/services', () => appServices);
 jest.unmock('../../src/app/index');
 
@@ -28,7 +28,7 @@ describe('SvelteExtend', () => {
     // Given
     let sut = null;
     const expectedServices = [
-      wootilsServices.appLogger,
+      appLoggerModule.appLoggerProvider,
       appServices.extender,
       appServices.jsMerger,
       appServices.sfcData,
@@ -39,8 +39,8 @@ describe('SvelteExtend', () => {
     // Then
     expect(sut).toBeInstanceOf(SvelteExtend);
     expect(sut.register).toHaveBeenCalledTimes(expectedServices.length);
-    expectedServices.forEach((service) => {
-      expect(sut.register).toHaveBeenCalledWith(service);
+    expectedServices.forEach((service, time) => {
+      expect(sut.register).toHaveBeenNthCalledWith(time + 1, service);
     });
   });
 

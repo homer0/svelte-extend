@@ -1,7 +1,7 @@
 const fs = require('fs/promises');
 const { Jimple } = require('@homer0/jimple');
 
-const { appLogger } = require('wootils/node/logger');
+const { appLoggerProvider } = require('@homer0/simple-logger');
 const services = require('../services');
 
 /**
@@ -16,7 +16,7 @@ class SvelteExtend extends Jimple {
   constructor() {
     super();
 
-    this.register(appLogger);
+    this.register(appLoggerProvider);
     this.register(services.extender);
     this.register(services.jsMerger);
     this.register(services.sfcData);
