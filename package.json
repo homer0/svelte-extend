@@ -18,7 +18,7 @@
     "@babel/traverse": "7.22.8",
     "@babel/types": "7.22.5",
     "@babel/generator": "7.22.9",
-    "jimple": "^1.5.0",
+    "@homer0/jimple": "^2.0.6",
     "@rollup/pluginutils": "^5.0.2",
     "wootils": "^5.0.1"
   },

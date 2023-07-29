@@ -1,5 +1,5 @@
 /* eslint-disable global-require */
-jest.mock('jimple', () => require('../mocks/jimple.mock'));
+jest.mock('@homer0/jimple', () => require('../mocks/jimple.mock'));
 jest.mock('@babel/types', () => require('../mocks/babelTypes.mock'));
 jest.mock('@babel/traverse', () => require('../mocks/babelTraverse.mock'));
 /* eslint-enable global-require */

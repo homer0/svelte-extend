@@ -1,3 +1,4 @@
+jest.mock('@homer0/jimple');
 jest.unmock('../src/index');
 
 const App = require('../src/app');

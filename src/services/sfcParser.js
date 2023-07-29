@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs/promises');
-const { provider } = require('jimple');
+const { provider } = require('@homer0/jimple');
 
 /**
  * @typedef {Object} SFCParserResultTag

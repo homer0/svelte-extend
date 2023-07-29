@@ -1,8 +1,9 @@
 const fs = require('fs/promises');
-const Jimple = require('jimple');
+const { Jimple } = require('@homer0/jimple');
 
 const { appLogger } = require('wootils/node/logger');
 const services = require('../services');
+
 /**
  * The application main interface and dependency injection container.
  *

@@ -9,7 +9,7 @@ const appServices = {
 };
 jest.mock('fs/promises');
 // eslint-disable-next-line global-require
-jest.mock('jimple', () => require('../mocks/jimple.mock'));
+jest.mock('@homer0/jimple', () => require('../mocks/jimple.mock'));
 jest.mock('wootils/node/logger', () => wootilsServices);
 jest.mock('../../src/services', () => appServices);
 jest.unmock('../../src/app/index');

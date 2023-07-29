@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 jest.mock('fs/promises');
 // eslint-disable-next-line global-require
-jest.mock('jimple', () => require('../mocks/jimple.mock'));
+jest.mock('@homer0/jimple', () => require('../mocks/jimple.mock'));
 jest.unmock('../../src/services/sfcParser');
 
 const fs = require('fs/promises');

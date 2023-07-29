@@ -1,5 +1,5 @@
 const path = require('path');
-const { provider } = require('jimple');
+const { provider } = require('@homer0/jimple');
 /**
  * This is the class that merges single file components (SFCs).
  */
