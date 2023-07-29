@@ -6,10 +6,9 @@
   ],
   "overrides": [
     {
-      "files": ["webpack.config.js"],
+      "files": ["webpack.config.js", "rollup.config.js"],
       "extends": [
-        "plugin:@homer0/node-with-prettier",
-        "plugin:@homer0/jsdoc"
+        "plugin:@homer0/node-with-prettier"
       ]
     }
   ]
