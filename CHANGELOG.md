@@ -1,3 +1,10 @@
+## [5.0.2](https://github.com/homer0/svelte-extend/compare/5.0.1...5.0.2) (2023-07-30)
+
+
+### Bug Fixes
+
+* reduce package size ([fa2cd96](https://github.com/homer0/svelte-extend/commit/fa2cd9699a5222e4a13d128ae53234cd285eca5d))
+
 ## [5.0.1](https://github.com/homer0/svelte-extend/compare/5.0.0...5.0.1) (2023-07-30)
 
 
