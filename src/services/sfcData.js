@@ -1,5 +1,5 @@
 const path = require('path');
-const { provider } = require('jimple');
+const { provider } = require('@homer0/jimple');
 /**
  * A basic class to handle single file components' (SFC) data and rendering for the app.
  */

@@ -1,6 +1,6 @@
 const path = require('path');
-const { provider } = require('jimple');
-const fs = require('fs-extra');
+const fs = require('fs/promises');
+const { provider } = require('@homer0/jimple');
 
 /**
  * @typedef {Object} SFCParserResultTag
@@ -97,10 +97,9 @@ class SFCParser {
    * @returns {Promise<?SFCData, Error>} If the file doesn't implement the `<extend />`
    *                                     tag, the promise will resolve with `null`.
    */
-  parseFromPath(filepath, maxDepth = 0) {
-    return fs
-      .readFile(filepath, 'utf-8')
-      .then((contents) => this.parse(contents, filepath, maxDepth));
+  async parseFromPath(filepath, maxDepth = 0) {
+    const contents = await fs.readFile(filepath, 'utf-8');
+    return this.parse(contents, filepath, maxDepth);
   }
   /**
    * Creates an instance of {@link SFCData} with the parsed results of an SFC.
@@ -247,18 +246,14 @@ class SFCParser {
    * @access protected
    * @ignore
    */
-  _loadDataFromPath(filepath, maxDepth, currentDepth) {
-    return fs.readFile(filepath, 'utf-8').then((contents) => {
-      let nextStep;
-      const extendTag = this._getExtendTag(contents);
-      if (extendTag) {
-        nextStep = this._parse(contents, filepath, maxDepth, currentDepth, extendTag);
-      } else {
-        nextStep = this._parseFileData(contents, filepath);
-      }
+  async _loadDataFromPath(filepath, maxDepth, currentDepth) {
+    const contents = await fs.readFile(filepath, 'utf-8');
+    const extendTag = this._getExtendTag(contents);
+    if (extendTag) {
+      return this._parse(contents, filepath, maxDepth, currentDepth, extendTag);
+    }
 
-      return nextStep;
-    });
+    return this._parseFileData(contents, filepath);
   }
   /**
    * The method that actually does the parsing. The reason this is not in
@@ -286,57 +281,43 @@ class SFCParser {
    * @access protected
    * @ignore
    */
-  _parse(contents, filepath, maxDepth, currentDepth, extendTag = null) {
-    let result;
+  async _parse(contents, filepath, maxDepth, currentDepth, extendTag = null) {
     const useExtendTag = extendTag || this._getExtendTag(contents);
-    if (useExtendTag && useExtendTag.attributes.from) {
-      const newCurrentDepth = currentDepth + 1;
-      if (maxDepth && newCurrentDepth > maxDepth) {
-        result = Promise.reject(
-          new Error(
-            `The file '${filepath}' can't extend from another file, the max depth ` +
-              `limit is set to ${maxDepth}`,
-          ),
-        );
-      } else {
-        const filedir = path.dirname(filepath);
-        const fromFilepath = path.join(filedir, useExtendTag.attributes.from);
-        result = fs
-          .pathExists(fromFilepath)
-          .then((exists) => {
-            let nextStep;
-            if (exists) {
-              nextStep = this._loadDataFromPath(fromFilepath, maxDepth, newCurrentDepth);
-            } else {
-              nextStep = Promise.reject(
-                new Error(
-                  `Unable to load '${useExtendTag.attributes.from}' from '${filepath}'`,
-                ),
-              );
-            }
-
-            return nextStep;
-          })
-          .then((data) => {
-            const file = this._createDataObject(
-              filepath,
-              this._parseFileData(contents.replace(useExtendTag.statement, ''), filepath),
-            );
-
-            const useData =
-              data instanceof this._sfcData
-                ? data
-                : this._createDataObject(fromFilepath, data);
-
-            file.addBaseFileData(useData, useExtendTag.attributes);
-            return file;
-          });
-      }
-    } else {
-      result = Promise.resolve(null);
+    if (!useExtendTag || !useExtendTag.attributes.from) {
+      return null;
     }
 
-    return result;
+    const newCurrentDepth = currentDepth + 1;
+    if (maxDepth && newCurrentDepth > maxDepth) {
+      throw new Error(
+        `The file '${filepath}' can't extend from another file, the max depth ` +
+          `limit is set to ${maxDepth}`,
+      );
+    }
+
+    const filedir = path.dirname(filepath);
+    const fromFilepath = path.join(filedir, useExtendTag.attributes.from);
+    const exists = await fs
+      .access(fromFilepath)
+      .then(() => true)
+      .catch(() => false);
+
+    if (!exists) {
+      throw new Error(
+        `Unable to load '${useExtendTag.attributes.from}' from '${filepath}'`,
+      );
+    }
+
+    const data = await this._loadDataFromPath(fromFilepath, maxDepth, newCurrentDepth);
+    const file = this._createDataObject(
+      filepath,
+      this._parseFileData(contents.replace(useExtendTag.statement, ''), filepath),
+    );
+    const useData =
+      data instanceof this._sfcData ? data : this._createDataObject(fromFilepath, data);
+
+    file.addBaseFileData(useData, useExtendTag.attributes);
+    return file;
   }
   /**
    * Parses a SFC code and extract the information about its scripts, styling and markup.

@@ -50,3 +50,4 @@ class JimpleMock {
 }
 
 module.exports = JimpleMock;
+module.exports.Jimple = JimpleMock;

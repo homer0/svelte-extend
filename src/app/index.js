@@ -1,8 +1,9 @@
-const fs = require('fs-extra');
-const Jimple = require('jimple');
+const fs = require('fs/promises');
+const { Jimple } = require('@homer0/jimple');
 
-const { appLogger } = require('wootils/node/logger');
+const { appLoggerProvider } = require('@homer0/simple-logger');
 const services = require('../services');
+
 /**
  * The application main interface and dependency injection container.
  *
@@ -15,7 +16,7 @@ class SvelteExtend extends Jimple {
   constructor() {
     super();
 
-    this.register(appLogger);
+    this.register(appLoggerProvider);
     this.register(services.extender);
     this.register(services.jsMerger);
     this.register(services.sfcData);
@@ -32,12 +33,14 @@ class SvelteExtend extends Jimple {
    * @returns {Promise<?string, Error>} If the file doesn't implement the `<extend />`
    *                                    tag, the promise will resolve with `null`.
    */
-  extend(contents, filepath, maxDepth = 0) {
-    return this.get('sfcParser')
-      .parse(contents, filepath, maxDepth)
-      .then((sfc) =>
-        sfc === null ? contents : this.get('extender').generate(sfc).render(),
-      );
+  async extend(contents, filepath, maxDepth = 0) {
+    const sfc = await this.get('sfcParser').parse(contents, filepath, maxDepth);
+    if (sfc === null) {
+      return contents;
+    }
+
+    const extended = this.get('extender').generate(sfc);
+    return extended.render();
   }
   /**
    * Extends an Svelte single file component that implements the `<extend />` tag by using
@@ -51,10 +54,9 @@ class SvelteExtend extends Jimple {
    * @returns {Promise<?string, Error>} If the file doesn't implement the `<extend />`
    *                                    tag, the promise will resolve with `null`.
    */
-  extendFromPath(filepath, maxDepth = 0) {
-    return fs
-      .readFile(filepath, 'utf-8')
-      .then((contents) => this.extend(contents, filepath, maxDepth));
+  async extendFromPath(filepath, maxDepth = 0) {
+    const contents = await fs.readFile(filepath, 'utf-8');
+    return this.extend(contents, filepath, maxDepth);
   }
 }
 

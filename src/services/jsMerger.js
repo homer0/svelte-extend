@@ -2,7 +2,7 @@ const babylon = require('babylon');
 const babelTraverse = require('@babel/traverse').default;
 const babelTypes = require('@babel/types');
 const babelGenerator = require('@babel/generator').default;
-const { provider } = require('jimple');
+const { provider } = require('@homer0/jimple');
 
 /**
  * Gets the name/ID of an AST node declaration.

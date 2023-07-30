@@ -1,8 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-if hash yarn 2>/dev/null; then
-  yarn test
-else
-  npm test
-fi
+npm test

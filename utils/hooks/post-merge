@@ -1,7 +1,0 @@
-#!/bin/bash -ex
-
-if hash yarn 2>/dev/null; then
-  yarn
-else
-  npm install
-fi

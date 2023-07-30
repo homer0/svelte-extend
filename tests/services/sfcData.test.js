@@ -1,5 +1,5 @@
 // eslint-disable-next-line global-require
-jest.mock('jimple', () => require('../mocks/jimple.mock'));
+jest.mock('@homer0/jimple', () => require('../mocks/jimple.mock'));
 jest.unmock('../../src/services/sfcData');
 
 const path = require('path');
