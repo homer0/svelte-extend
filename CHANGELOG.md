@@ -1,3 +1,19 @@
+# [5.0.0](https://github.com/homer0/svelte-extend/compare/4.0.0...5.0.0) (2023-07-30)
+
+
+### Bug Fixes
+
+* drop Node 14 support ([27eb7ea](https://github.com/homer0/svelte-extend/commit/27eb7ea1e59c17a50e16ef02f0684e0130f39870))
+* remove the need for fs-extra ([46f6723](https://github.com/homer0/svelte-extend/commit/46f67234e3dc032974c288dabf4c5ea9a8df9144))
+* remove wootils dep ([571a20b](https://github.com/homer0/svelte-extend/commit/571a20b3e9faa3aaea5256c641dbd9d5b67e8779))
+* update dependencies ([7ec1447](https://github.com/homer0/svelte-extend/commit/7ec144745d618de07d8cc4dd0eb3e649afb62ef1))
+* use @homer0/jimple ([2ec554c](https://github.com/homer0/svelte-extend/commit/2ec554c75c25df175a603e3ca8a651b44d39e98f))
+
+
+### BREAKING CHANGES
+
+* This library now requires Node >= 16
+
 # [4.0.0](https://github.com/homer0/svelte-extend/compare/3.0.1...4.0.0) (2022-05-21)
 
 
