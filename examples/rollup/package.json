@@ -17,7 +17,8 @@
     "rollup-plugin-svelte": "^7.1.6",
     "rollup-plugin-css-only": "^4.3.0",
     "svelte": "^4.1.1",
-    "svelte-extend": "file:../../"
+    "svelte-extend": "file:../../",
+    "svelte-extend-app": "file:../app"
   },
   "scripts": {
     "build": "NODE_ENV=production rollup -c",

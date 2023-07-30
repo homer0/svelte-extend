@@ -1,11 +1,5 @@
-import './global.css';
-import App from './app.svelte';
+import { createApp } from 'svelte-extend-app';
 
-const app = new App({
-  target: document.body,
-  props: {
-    name: 'world',
-  },
+export default createApp({
+  name: 'webpack',
 });
-
-export default app;

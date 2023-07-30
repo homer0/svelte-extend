@@ -12,6 +12,7 @@
     "eslint-plugin-svelte": "^2.32.4",
     "mini-css-extract-plugin": "^2.7.6",
     "svelte-extend": "file:../../",
+    "svelte-extend-app": "file:../app",
     "svelte-loader": "^3.1.9",
     "svelte": "^4.1.1",
     "webpack": "^5.88.2",

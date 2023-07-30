@@ -11,5 +11,8 @@
         "plugin:@homer0/node-with-prettier"
       ]
     }
-  ]
+  ],
+  "rules": {
+    "implicit-arrow-linebreak": "off"
+  }
 }
