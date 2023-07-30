@@ -1,3 +1,10 @@
+## [5.0.1](https://github.com/homer0/svelte-extend/compare/5.0.0...5.0.1) (2023-07-30)
+
+
+### Bug Fixes
+
+* update deps shield ([6f17ff0](https://github.com/homer0/svelte-extend/commit/6f17ff0d6c583225a277ea169ba43b3768548bf8))
+
 # [5.0.0](https://github.com/homer0/svelte-extend/compare/4.0.0...5.0.0) (2023-07-30)
 
 
