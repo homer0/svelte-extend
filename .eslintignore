@@ -3,3 +3,5 @@ coverage/*
 documentation/*
 node_modules/*
 docs/*
+**/public/dist*
+**/public/bundle*
