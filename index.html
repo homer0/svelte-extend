@@ -90,10 +90,9 @@
 
     <section class="readme usertext">
         <article><h1>svelte-extend</h1>
-<p><a href="https://github.com/homer0/svelte-extend/actions?query=workflow%3ATest"><img src="https://img.shields.io/github/workflow/status/homer0/svelte-extend/Test/main?style=flat-square" alt="GitHub Workflow Status (main)"></a>
+<p><a href="https://github.com/homer0/svelte-extend/actions?query=workflow%3ATest"><img src="https://img.shields.io/github/actions/workflow/status/homer0/svelte-extend/test.yml?branch=main&amp;style=flat-square" alt="GitHub Workflow Status (main)"></a>
 <a href="https://coveralls.io/github/homer0/svelte-extend?branch=main"><img src="https://img.shields.io/coveralls/github/homer0/svelte-extend.svg?style=flat-square" alt="Coveralls github"></a>
-<a href="https://david-dm.org/homer0/svelte-extend"><img src="https://img.shields.io/david/homer0/svelte-extend.svg?style=flat-square" alt="David"></a>
-<a href="https://david-dm.org/homer0/svelte-extend"><img src="https://img.shields.io/david/dev/homer0/svelte-extend.svg?style=flat-square" alt="David"></a></p>
+<img src="https://img.shields.io/librariesio/release/npm/%40homer0/svelte-extend/latest" alt="Dependencies status"></p>
 <p>Create new Svelte components by extending existing ones</p>
 <h2>Introduction</h2>
 <blockquote>
@@ -193,6 +192,8 @@
 <ul>
 <li><code>allowedMaxDepth</code>: By default, the library allows you to also extend from already extended components, but if you want to limit how much &quot;levels&quot; a component could extend from, you can use this parameter. The default value is <code>0</code>, meaning it has no limit.</li>
 </ul>
+<h4>Example</h4>
+<p>You can find an example project on the <a href="https://github.com/homer0/svelte-extend/examples/webpack"><code>examples/webpack</code></a> folder.</p>
 <h3>Rollup</h3>
 <p>The library also includes a Rollup plugin:</p>
 <pre class="prettyprint source lang-js"><code>const svelteExtend = require('svelte-extend/rollup');
@@ -222,8 +223,10 @@ module.exports = {
 <li><code>include</code> &amp; <code>exclude</code>: The basic options for almost all Rollup plugins, to define which files should and shouldn't be processed by a plugin.</li>
 <li><code>allowedMaxDepth</code>: By default, the library allows you to also extend from already extended components, but if you want to limit how much &quot;levels&quot; a component could extend from, you can use this parameter. The default value is <code>0</code>, meaning it has no limit.</li>
 </ul>
+<h4>Example</h4>
+<p>You can find an example project on the <a href="https://github.com/homer0/svelte-extend/examples/rollup"><code>examples/rollup</code></a> folder.</p>
 <h2>Development</h2>
-<h3>NPM/Yarn tasks</h3>
+<h3>NPM tasks</h3>
 <table>
 <thead>
 <tr>
@@ -255,7 +258,7 @@ module.exports = {
 </tbody>
 </table>
 <h3>Repository hooks</h3>
-<p>I use <a href="https://yarnpkg.com/package/husky"><code>husky</code></a> to automatically install the repository hooks so...</p>
+<p>I use <a href="https://www.npmjs.com/package/husky"><code>husky</code></a> to automatically install the repository hooks so...</p>
 <ol>
 <li>The code will be formatted and linted before any commit.</li>
 <li>The dependencies will be updated after every merge.</li>
@@ -265,14 +268,14 @@ module.exports = {
 <p>I use <a href="https://www.conventionalcommits.org">conventional commits</a> with <a href="https://commitlint.js.org"><code>commitlint</code></a> in order to support semantic releases. The one that sets it up is actually husky, that installs a script that runs <code>commitlint</code> on the <code>git commit</code> command.</p>
 <p>The configuration is on the <code>commitlint</code> property of the <code>package.json</code>.</p>
 <h3>Releases</h3>
-<p>I use <a href="https://yarnpkg.com/package/semantic-release"><code>semantic-release</code></a> and a GitHub action to automatically release on NPM everything that gets merged to main.</p>
+<p>I use <a href="https://www.npmjs.com/package/semantic-release"><code>semantic-release</code></a> and a GitHub action to automatically release on NPM everything that gets merged to main.</p>
 <p>The configuration for <code>semantic-release</code> is on <code>./releaserc</code> and the workflow for the release is on <code>./.github/workflow/release.yml</code>.</p>
 <h3>Testing</h3>
 <p>I use <a href="https://facebook.github.io/jest/">Jest</a> to test the project.</p>
 <p>The configuration file is on <code>./.jestrc.js</code>, the tests are on <code>./tests</code> and the script that runs it is on <code>./utils/scripts/test</code>.</p>
 <h3>Code linting and formatting</h3>
-<p>For linting, I use <a href="https://eslint.org">ESlint</a> with <a href="https://yarnpkg.com/package/@homer0/eslint-plugin">my own custom configuration</a>; there are two configuration files, <code>./.eslintrc</code> for the source and the tooling, and <code>./tests/.eslintrc</code>, and there's also a <code>./.eslintignore</code> to exclude some files.</p>
-<p>And for formatting, I use <a href="https://prettier.io">Prettier</a> with <a href="https://yarnpkg.com/package/@homer0/prettier-plugin-jsdoc">my JSDoc plugin</a> and <a href="https://yarnpkg.com/package/@homer0/prettier-config">my own custom configuration</a>. The configuration file is <code>./.prettierrc</code>.</p>
+<p>For linting, I use <a href="https://eslint.org">ESlint</a> with <a href="https://www.npmjs.com/package/@homer0/eslint-plugin">my own custom configuration</a>; there are two configuration files, <code>./.eslintrc</code> for the source and the tooling, and <code>./tests/.eslintrc</code>, and there's also a <code>./.eslintignore</code> to exclude some files.</p>
+<p>And for formatting, I use <a href="https://prettier.io">Prettier</a> with <a href="https://www.npmjs.com/package/@homer0/prettier-plugin-jsdoc">my JSDoc plugin</a> and <a href="https://www.npmjs.com/package/@homer0/prettier-config">my own custom configuration</a>. The configuration file is <code>./.prettierrc</code>.</p>
 <p>The script that runs them is <code>./utils/scripts/lint</code>; the script <code>lint-all</code> only runs ESLint, and runs it for the entire project.</p>
 <h3>Documentation</h3>
 <p>I use <a href="https://jsdoc.app">JSDoc</a> to generate an HTML documentation site for the project.</p>
@@ -293,7 +296,7 @@ module.exports = {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> using a forked <a href="https://github.com/homer0/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.2</a> using a forked <a href="https://github.com/homer0/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
