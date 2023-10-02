@@ -53,7 +53,7 @@
   },
   "engine-strict": true,
   "engines": {
-    "node": ">=16 <21"
+    "node": ">=18.17 <21"
   },
   "main": "src/index.js",
   "scripts": {

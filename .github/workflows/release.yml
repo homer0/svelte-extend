@@ -10,13 +10,11 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Read .nvmrc
-        run: echo "::set-output name=NVMRC::$(cat .nvmrc)"
-        id: nvm
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - name: Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version-file: '.nvmrc'
       - name: Install dependencies
         env:
           HUSKY: 0
