@@ -39,6 +39,8 @@
     "@homer0/eslint-plugin": "^11.0.0",
     "@homer0/prettier-config": "^1.1.3",
     "@homer0/prettier-plugin-jsdoc": "^7.0.3",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
     "docdash": "homer0/docdash#semver:^2.1.2",
     "eslint": "^8.46.0",
     "eslint-plugin-svelte": "^2.32.4",
@@ -49,6 +51,7 @@
     "lint-staged": "^13.2.3",
     "prettier": "^3.0.0",
     "leasot": "^13.3.0",
+    "semantic-release": "^21.0.7",
     "svelte": "^4.1.1"
   },
   "engine-strict": true,
