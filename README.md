@@ -2,7 +2,7 @@
 
 [![GitHub Workflow Status (main)](https://img.shields.io/github/actions/workflow/status/homer0/svelte-extend/test.yml?branch=main&style=flat-square)](https://github.com/homer0/svelte-extend/actions?query=workflow%3ATest)
 [![Coveralls github](https://img.shields.io/coveralls/github/homer0/svelte-extend.svg?style=flat-square)](https://coveralls.io/github/homer0/svelte-extend?branch=main)
-![Dependencies status](https://img.shields.io/librariesio/release/npm/svelte-extend/latest)
+![Dependencies status](https://img.shields.io/librariesio/release/npm/svelte-extend/latest?style=flat-square)
 
 Create new Svelte components by extending existing ones
 
