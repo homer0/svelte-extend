@@ -1,3 +1,16 @@
+# [6.0.0](https://github.com/homer0/svelte-extend/compare/5.0.2...6.0.0) (2023-10-02)
+
+
+### Bug Fixes
+
+* drop Node 16 support ([e7c4ea7](https://github.com/homer0/svelte-extend/commit/e7c4ea77a5f14b0d3f77fd5bdb1618a958c826ca))
+* update dependencies ([bcaaed3](https://github.com/homer0/svelte-extend/commit/bcaaed3816863727737ded7272d3fc6bf98dcbca))
+
+
+### BREAKING CHANGES
+
+* Node 16 is not longer supported. Node 18.17 is the minimum required version now.
+
 ## [5.0.2](https://github.com/homer0/svelte-extend/compare/5.0.1...5.0.2) (2023-07-30)
 
 
